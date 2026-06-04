@@ -1,0 +1,9 @@
+node_modules/
+dist/
+output/
+*.mp4
+*.webm
+*.mov
+input-props.json
+public/assets/
+content/

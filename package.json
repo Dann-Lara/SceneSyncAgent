@@ -1,0 +1,33 @@
+{
+  "name": "video-blueprint",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "studio": "remotion studio",
+    "render": "npx tsx src/scripts/render-video.ts",
+    "validate": "npx tsx src/scripts/validate-content.ts",
+    "create-structure": "npx tsx src/scripts/create-structure.ts",
+    "typecheck": "npx tsc --noEmit",
+    "validate-timing": "npx tsx src/scripts/validate-timing.ts",
+    "setup": "npm install && pip install openai-whisper"
+  },
+  "dependencies": {
+    "@remotion/bundler": "^4.0.457",
+    "@remotion/cli": "^4.0.457",
+    "@remotion/google-fonts": "4.0.469",
+    "@remotion/light-leaks": "4.0.469",
+    "@remotion/renderer": "^4.0.457",
+    "@remotion/transitions": "^4.0.469",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "remotion": "^4.0.457"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.0",
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "tsx": "^4.16.0",
+    "typescript": "^5.5.0"
+  }
+}
