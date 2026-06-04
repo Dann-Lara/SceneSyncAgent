@@ -7,3 +7,5 @@ output/
 input-props.json
 public/assets/
 content/
+tmp_whisper_*/
+render-error.log
