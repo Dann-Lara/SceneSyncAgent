@@ -1,4 +1,4 @@
-# Video Blueprint
+# Scene Sync Agent
 
 Pipeline automatizado para crear videopresentaciones narradas con sincronización frame-exacta usando OpenAI Whisper y Remotion.
 
