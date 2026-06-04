@@ -555,7 +555,8 @@ function sentimentToTransition(
   sentiment: Sentiment,
   prevSentiment: Sentiment | null,
   imageIndex: number,
-  totalImages: number
+  totalImages: number,
+  chapterIndex: number = 0
 ): { type: TransitionType; duration: number } {
   const currentIntensity = SENTIMENT_INTENSITY[sentiment];
   const prevIntensity = prevSentiment ? SENTIMENT_INTENSITY[prevSentiment] : currentIntensity;
@@ -769,7 +770,7 @@ function sentimentToTransition(
 
   // Deterministic pick based on image index + chapter position (not purely sequential)
   const totalWeight = options.reduce((s, o) => s + o.weight, 0);
-  const seed = ((imageIndex * 11 + totalImages * 3) % totalWeight);
+  const seed = ((chapterIndex * 97 + imageIndex * 11 + totalImages * 3) % totalWeight);
   let acc = 0;
   for (const opt of options) {
     acc += opt.weight;
@@ -813,7 +814,8 @@ function assignImagesToParagraphs(
   tagPauses: number[],
   wpmFactors: number[],
   totalAudioDuration: number,
-  fps: number
+  fps: number,
+  chapterIndex: number = 0
 ): ImageMeta[] {
   if (images.length === 0) return [];
   if (paragraphs.length === 0 || totalAudioDuration <= 0) {
@@ -865,7 +867,7 @@ function assignImagesToParagraphs(
     const prevIntensity = prevSentiment ? SENTIMENT_INTENSITY[prevSentiment] : SENTIMENT_INTENSITY[sentiment];
     const escalation = SENTIMENT_INTENSITY[sentiment] - prevIntensity;
 
-    const transition = sentimentToTransition(sentiment, prevSentiment, i, images.length);
+    const transition = sentimentToTransition(sentiment, prevSentiment, i, images.length, chapterIndex);
     const kenBurns = sentimentToKenBurns(sentiment, escalation);
     prevSentiment = sentiment;
 
@@ -931,7 +933,9 @@ function assignImagesToParagraphs(
   const totalAssigned = result.reduce((s, img) => s + img.durationInFrames, 0);
   const targetFrames = Math.round(totalAudioDuration * fps);
   const diff = targetFrames - totalAssigned;
-  if (result.length > 0) result[result.length - 1].durationInFrames += diff + CHAPTER_PAUSE_FRAMES;
+  // FIX: solo absorber el error de redondeo en la última imagen
+  // CHAPTER_PAUSE_FRAMES se suma al total de la escena en buildScenes(), no aquí
+  if (result.length > 0) result[result.length - 1].durationInFrames += diff;
 
   return result;
 }
@@ -1181,7 +1185,9 @@ async function assignFramesWithWeights(
   const totalAssigned = result.reduce((s, img) => s + img.durationInFrames, 0);
   const targetFrames = Math.round(totalAudioDuration * fps);
   const diff = targetFrames - totalAssigned;
-  if (result.length > 0) result[result.length - 1].durationInFrames += diff + CHAPTER_PAUSE_FRAMES;
+  // FIX: solo absorber el error de redondeo en la última imagen
+  // CHAPTER_PAUSE_FRAMES se suma al total de la escena en buildScenes(), no aquí
+  if (result.length > 0) result[result.length - 1].durationInFrames += diff;
 
   return result;
 }
@@ -1253,7 +1259,9 @@ function assignFramesFromDirections(
   const totalAssigned = result.reduce((s, img) => s + img.durationInFrames, 0);
   const targetFrames = Math.round(totalAudioDuration * fps);
   const diff = targetFrames - totalAssigned;
-  if (result.length > 0) result[result.length - 1].durationInFrames += diff + CHAPTER_PAUSE_FRAMES;
+  // FIX: solo absorber el error de redondeo en la última imagen
+  // CHAPTER_PAUSE_FRAMES se suma al total de la escena en buildScenes(), no aquí
+  if (result.length > 0) result[result.length - 1].durationInFrames += diff;
 
   return result;
 }
@@ -1377,18 +1385,18 @@ export async function buildScenes(
                   kenBurnsEnd: img.kenBurnsEnd,
                 };
               });
-              // Ensure scene covers full audio duration + chapter pause
+              // FIX: solo distribuir la diferencia de redondeo entre las imágenes
+              // CHAPTER_PAUSE_FRAMES se suma al total de la escena en scenes.push(), no aquí
               const whisperSum = imageMetas.reduce((s: number, img: { durationInFrames: number }) => s + img.durationInFrames, 0);
               const audioFrames = Math.round(audioDuration * FPS);
               const extraFrames = Math.max(0, audioFrames - whisperSum);
-              const totalExtra = CHAPTER_PAUSE_FRAMES + extraFrames;
-              if (imageMetas.length > 0) {
+              if (extraFrames > 0 && imageMetas.length > 0) {
                 let distributed = 0;
                 const lastIdx = imageMetas.length - 1;
                 for (let i = 0; i < imageMetas.length; i++) {
                   const extra = i < lastIdx
-                    ? Math.round(totalExtra * imageMetas[i].durationInFrames / whisperSum)
-                    : totalExtra - distributed;
+                    ? Math.round(extraFrames * imageMetas[i].durationInFrames / whisperSum)
+                    : extraFrames - distributed;
                   imageMetas[i].durationInFrames += extra;
                   distributed += extra;
                 }
@@ -1441,7 +1449,8 @@ export async function buildScenes(
             chapterGuion.tagPauses,
             chapterGuion.wpmFactors,
             audioDuration,
-            FPS
+            FPS,
+            i
           );
         } else {
           const equalDur = Math.round((audioDuration * FPS) / Math.max(allVisuals.length, 1));
@@ -1467,7 +1476,7 @@ export async function buildScenes(
       title,
       audioPath,
       audioDurationSeconds: audioDuration,
-      durationInFrames: imageMetas.reduce((s: number, img: { durationInFrames: number }) => s + img.durationInFrames, 0),
+      durationInFrames: imageMetas.reduce((s: number, img: { durationInFrames: number }) => s + img.durationInFrames, 0) + CHAPTER_PAUSE_FRAMES,
       images: imageMetas,
     });
 

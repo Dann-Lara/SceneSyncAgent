@@ -1,0 +1,1076 @@
+{
+  "scenes": [
+    {
+      "chapterIndex": 0,
+      "images": [
+        {
+          "imageFile": "1.png",
+          "textInclude": "El Doctor Silias Thorne no habitaba el mundo. Lo decodificaba.",
+          "scriptParagraphs": [
+            0
+          ],
+          "transitionToNext": "fade",
+          "transitionDuration": 1,
+          "kenBurnsStart": 1,
+          "kenBurnsEnd": 1.06,
+          "sentiment": "calm",
+          "contextNote": "introduccion-calma",
+          "durationInFrames": 202
+        },
+        {
+          "imageFile": "2.png",
+          "textInclude": "Antes del fuego era el espécimen más completo que la civilización había producido sin saberlo. Un POLÍMATA. Un arquitecto de certezas. Sus manos podían ejecutar jazz a velocidades inhumanas o trazar el colapso de una ciudad con la misma PRECISIÓN FRÍA.",
+          "scriptParagraphs": [
+            1,
+            2,
+            3
+          ],
+          "transitionToNext": "crossfade",
+          "transitionDuration": 1.2,
+          "kenBurnsStart": 1,
+          "kenBurnsEnd": 1.06,
+          "sentiment": "calm",
+          "contextNote": "introduccion-calma",
+          "durationInFrames": 596
+        },
+        {
+          "imageFile": "3.png",
+          "textInclude": "Para él la línea recta y el filo eran las únicas verdades en un universo de ruido.",
+          "scriptParagraphs": [
+            4
+          ],
+          "transitionToNext": "fade",
+          "transitionDuration": 0.8,
+          "kenBurnsStart": 1.04,
+          "kenBurnsEnd": 1.15,
+          "sentiment": "drama",
+          "contextNote": "sostenido-drama",
+          "durationInFrames": 190
+        },
+        {
+          "imageFile": "4.png",
+          "textInclude": "Como Arquitecto de Riesgos Globales, Thorne predijo el fin. No como profecía. Como cálculo. Noventa y nueve punto ocho por ciento de probabilidad de COLAPSO TOTAL. Entregó el reporte. Sus superiores leyeron los números y eligieron la bolsa.",
+          "scriptParagraphs": [
+            5,
+            6,
+            7,
+            8,
+            9
+          ],
+          "transitionToNext": "3d-flip",
+          "transitionDuration": 1.5,
+          "kenBurnsStart": 1,
+          "kenBurnsEnd": 1.06,
+          "sentiment": "calm",
+          "contextNote": "introduccion-calma",
+          "durationInFrames": 599
+        },
+        {
+          "imageFile": "5.png",
+          "textInclude": "La ciudad ardió con una precisión del NOVENTA Y NUEVE PUNTO OCHO POR CIENTO. Los sistemas de emergencia que él mismo diseñó habían sido optimizados para proteger activos corporativos.",
+          "scriptParagraphs": [
+            10
+          ],
+          "transitionToNext": "radial",
+          "transitionDuration": 0.6,
+          "kenBurnsStart": 1.04,
+          "kenBurnsEnd": 1.15,
+          "sentiment": "drama",
+          "contextNote": "sostenido-drama",
+          "durationInFrames": 395
+        },
+        {
+          "imageFile": "6.png",
+          "textInclude": "Las zonas residenciales eran VARIABLES SACRIFICABLES en la ecuación del capital. Su familia era una variable sacrificable.",
+          "scriptParagraphs": [
+            11
+          ],
+          "transitionToNext": "fade",
+          "transitionDuration": 1,
+          "kenBurnsStart": 1,
+          "kenBurnsEnd": 1.06,
+          "sentiment": "calm",
+          "contextNote": "introduccion-calma",
+          "durationInFrames": 304
+        },
+        {
+          "imageFile": "7.png",
+          "textInclude": "El vidrio perfecto que había sostenido toda su vida se rompió. Y en ese momento nació algo diferente.",
+          "scriptParagraphs": [
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18
+          ],
+          "transitionToNext": "crossfade",
+          "transitionDuration": 1.2,
+          "kenBurnsStart": 1,
+          "kenBurnsEnd": 1.06,
+          "sentiment": "calm",
+          "contextNote": "introduccion-calma",
+          "durationInFrames": 259
+        }
+      ]
+    },
+    {
+      "chapterIndex": 1,
+      "images": [
+        {
+          "imageFile": "1.png",
+          "textInclude": "Atrapado bajo escombros incandescentes con el flanco izquierdo calcinado y los nervios destrozados el Doctor Thorne fue el único espectador de su propia tragedia.",
+          "scriptParagraphs": [
+            0,
+            1,
+            2
+          ],
+          "transitionToNext": "slide-right",
+          "transitionDuration": 1,
+          "kenBurnsStart": 1,
+          "kenBurnsEnd": 1.06,
+          "sentiment": "calm",
+          "contextNote": "introduccion-calma",
+          "durationInFrames": 364
+        },
+        {
+          "imageFile": "2.png",
+          "textInclude": "A través de las cámaras de seguridad que él mismo instaló monitores que transmitían con una fidelidad obscena vio cómo su familia era consumida. En ese momento el Doctor Silias Thorne MURIÓ. Lo que quedó arrastrándose entre los restos humeantes no era un hombre. Era un algoritmo buscando una salida.",
+          "scriptParagraphs": [
+            3
+          ],
+          "transitionToNext": "flash",
+          "transitionDuration": 0.4,
+          "kenBurnsStart": 1.04,
+          "kenBurnsEnd": 1.15,
+          "sentiment": "drama",
+          "contextNote": "sostenido-drama",
+          "durationInFrames": 726
+        },
+        {
+          "imageFile": "3.png",
+          "textInclude": "Llegó a su laboratorio privado. Sus prototipos de drones médicos iniciaron la reconstrucción. No hubo anestesia. Thorne procesó cada corte de los actuadores neumáticos y cada soldadura de fibra de carbono no como dolor. Sino como una DEPURACIÓN DE ERRORES DE SISTEMA.",
+          "scriptParagraphs": [
+            4
+          ],
+          "transitionToNext": "zoom-out",
+          "transitionDuration": 1.2,
+          "kenBurnsStart": 1,
+          "kenBurnsEnd": 1.06,
+          "sentiment": "calm",
+          "contextNote": "introduccion-calma",
+          "durationInFrames": 651
+        },
+        {
+          "imageFile": "4.png",
+          "textInclude": "El brazo izquierdo dejó de ser carne. Se convirtió en una extensión modular de sus máquinas. Un puerto de enlace. Un arma.",
+          "scriptParagraphs": [
+            5,
+            6,
+            7,
+            8,
+            9
+          ],
+          "transitionToNext": "fade",
+          "transitionDuration": 1,
+          "kenBurnsStart": 1,
+          "kenBurnsEnd": 1.06,
+          "sentiment": "calm",
+          "contextNote": "introduccion-calma",
+          "durationInFrames": 288
+        },
+        {
+          "imageFile": "5.png",
+          "textInclude": "Al emerger de las cenizas Thorne proyectaba un silencio absoluto. Su presencia generaba en los humanos cercanos una respuesta primaria e involuntaria. Congelamiento biológico.",
+          "scriptParagraphs": [
+            10
+          ],
+          "transitionToNext": "radial",
+          "transitionDuration": 0.6,
+          "kenBurnsStart": 1.04,
+          "kenBurnsEnd": 1.15,
+          "sentiment": "drama",
+          "contextNote": "sostenido-drama",
+          "durationInFrames": 365
+        },
+        {
+          "imageFile": "6.png",
+          "textInclude": "El libre albedrío era el único error que la evolución no había podido depurar. Thorne decidió depurarlo él mismo.",
+          "scriptParagraphs": [
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21
+          ],
+          "transitionToNext": "slide-right",
+          "transitionDuration": 1,
+          "kenBurnsStart": 1,
+          "kenBurnsEnd": 1.06,
+          "sentiment": "calm",
+          "contextNote": "introduccion-calma",
+          "durationInFrames": 282
+        }
+      ]
+    },
+    {
+      "chapterIndex": 2,
+      "images": [
+        {
+          "imageFile": "1.png",
+          "textInclude": "La guarida de Thorne no era un búnker de villano.",
+          "scriptParagraphs": [
+            0,
+            1
+          ],
+          "transitionToNext": "zoom-out",
+          "transitionDuration": 1.2,
+          "kenBurnsStart": 1,
+          "kenBurnsEnd": 1.06,
+          "sentiment": "calm",
+          "contextNote": "introduccion-calma",
+          "durationInFrames": 118
+        },
+        {
+          "imageFile": "2.png",
+          "textInclude": "Era una sala de servidores refrigerada donde el silencio solo era roto por el zumbido de FRECUENCIA SUBSÓNICA de sus drones escolta.",
+          "scriptParagraphs": [
+            2
+          ],
+          "transitionToNext": "flash",
+          "transitionDuration": 0.4,
+          "kenBurnsStart": 1.04,
+          "kenBurnsEnd": 1.15,
+          "sentiment": "drama",
+          "contextNote": "sostenido-drama",
+          "durationInFrames": 284
+        },
+        {
+          "imageFile": "3.png",
+          "textInclude": "Thorne observaba la red del Cártel La Medusa no como una organización criminal. Sino como un aumento crítico en la ENTROPÍA DE LA INFORMACIÓN de la ciudad. Para él la trata de personas y el narcotráfico eran RUIDO ESTADÍSTICO que degradaba la eficiencia del sistema social.",
+          "scriptParagraphs": [
+            3
+          ],
+          "transitionToNext": "3d-flip",
+          "transitionDuration": 0.9,
+          "kenBurnsStart": 1.04,
+          "kenBurnsEnd": 1.15,
+          "sentiment": "tension",
+          "contextNote": "tension-creciente",
+          "durationInFrames": 695
+        },
+        {
+          "imageFile": "4.png",
+          "textInclude": "Utilizando su Motor Determinista mapeaba los nodos de corrupción. Cada funcionario gubernamental protegido por el cártel aparecía en sus monitores como un BIT CORRUPTO en un sector defectuoso que debía ser sobrescrito.",
+          "scriptParagraphs": [
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10
+          ],
+          "transitionToNext": "slide-right",
+          "transitionDuration": 1,
+          "kenBurnsStart": 1,
+          "kenBurnsEnd": 1.06,
+          "sentiment": "calm",
+          "contextNote": "introduccion-calma",
+          "durationInFrames": 472
+        },
+        {
+          "imageFile": "5.png",
+          "textInclude": "Pero la atmósfera era de una gélida frustración. Mientras programaba los protocolos de intrusión Thorne experimentaba el delay de milisegundos en sus dedos. Esa latencia insoportable entre su intención y la respuesta de su hardware terrestre que solo alcanzaba el SETENTA POR CIENTO de eficiencia motriz.",
+          "scriptParagraphs": [
+            11,
+            12,
+            13,
+            14,
+            15
+          ],
+          "transitionToNext": "radial",
+          "transitionDuration": 0.7,
+          "kenBurnsStart": 1.04,
+          "kenBurnsEnd": 1.15,
+          "sentiment": "tension",
+          "contextNote": "tension-creciente",
+          "durationInFrames": 698
+        }
+      ]
+    },
+    {
+      "chapterIndex": 3,
+      "images": [
+        {
+          "imageFile": "1.png",
+          "textInclude": "La aniquilación no comenzó con explosiones. Sino con un susurro algorítmico. Aplicando el MAQUIAVELISMO DIGITAL Thorne alteró los flujos de capital de La Medusa. Los pagos de nómina se desviaron hacia cuentas de facciones rivales dentro del mismo cártel.",
+          "scriptParagraphs": [
+            0,
+            1,
+            2,
+            3,
+            4
+          ],
+          "transitionToNext": "crossfade",
+          "transitionDuration": 1.2,
+          "kenBurnsStart": 1,
+          "kenBurnsEnd": 1.06,
+          "sentiment": "calm",
+          "contextNote": "introduccion-calma",
+          "durationInFrames": 577
+        },
+        {
+          "imageFile": "2.png",
+          "textInclude": "Sus Vectores de Inercia esculturas cinéticas de metal líquido y cuchillas se infiltraron en los búnkeres para realizar sabotajes quirúrgicos. Una línea de comunicación cortada aquí. Un servidor cifrado allá.",
+          "scriptParagraphs": [
+            5
+          ],
+          "transitionToNext": "zoom-blur",
+          "transitionDuration": 0.8,
+          "kenBurnsStart": 1.02,
+          "kenBurnsEnd": 1.1,
+          "sentiment": "mystery",
+          "contextNote": "misterio-intriga",
+          "durationInFrames": 428
+        },
+        {
+          "imageFile": "3.png",
+          "textInclude": "La paranoia se propagó como un virus. Thorne filtró pruebas de traición falsas para que los líderes de La Medusa se ejecutaran entre ellos creyendo que limpiaban su propia casa. Era un SISTEMA DE LAZO CERRADO donde el enemigo era su propio verdugo. Sin embargo el algoritmo encontró una anomalía.",
+          "scriptParagraphs": [
+            6,
+            7,
+            8,
+            9,
+            10
+          ],
+          "transitionToNext": "3d-flip",
+          "transitionDuration": 1.5,
+          "kenBurnsStart": 1,
+          "kenBurnsEnd": 1.06,
+          "sentiment": "calm",
+          "contextNote": "introduccion-calma",
+          "durationInFrames": 626
+        },
+        {
+          "imageFile": "4.png",
+          "textInclude": "Thorne impulsado por un resto de NECEDAD HUMANA decidió intervenir físicamente. Fue su primer error táctico. El exoesqueleto sufrió una sobrecarga dejando un rastro detectable. Comprendió entonces con una frialdad analítica que la fuerza bruta era RUIDOSA e ineficiente frente a la elegancia del silencio digital.",
+          "scriptParagraphs": [
+            11
+          ],
+          "transitionToNext": "radial",
+          "transitionDuration": 0.7,
+          "kenBurnsStart": 1.04,
+          "kenBurnsEnd": 1.15,
+          "sentiment": "tension",
+          "contextNote": "tension-creciente",
+          "durationInFrames": 711
+        },
+        {
+          "imageFile": "5.png",
+          "textInclude": "La Medusa no cayó por una redada policial. Cayó por una IMPLOSIÓN SISTÉMICA TOTAL. Thorne ajustó sus parámetros. Y fijó la mirada en el siguiente entorno de prueba.",
+          "scriptParagraphs": [
+            12,
+            13,
+            14,
+            15,
+            16,
+            17
+          ],
+          "transitionToNext": "fade",
+          "transitionDuration": 1,
+          "kenBurnsStart": 1,
+          "kenBurnsEnd": 1.06,
+          "sentiment": "calm",
+          "contextNote": "introduccion-calma",
+          "durationInFrames": 397
+        }
+      ]
+    },
+    {
+      "chapterIndex": 4,
+      "images": [
+        {
+          "imageFile": "1.png",
+          "textInclude": "Vlatava no era una nación. Era un sistema operativo con SECTORES DEFECTUOSOS. Para Thorne el vacío de poder dejado por el cártel no era una oportunidad política. Era un ERROR DE SEGMENTACIÓN en la memoria del tejido social que debía ser corregido mediante una administración tecnocrática absoluta.",
+          "scriptParagraphs": [
+            0,
+            1,
+            2
+          ],
+          "transitionToNext": "3d-flip",
+          "transitionDuration": 1.5,
+          "kenBurnsStart": 1,
+          "kenBurnsEnd": 1.06,
+          "sentiment": "calm",
+          "contextNote": "introduccion-calma",
+          "durationInFrames": 599
+        },
+        {
+          "imageFile": "2.png",
+          "textInclude": "No había tanques en las calles. El control se ejercía a través de la infraestructura básica. La red eléctrica el suministro de agua los nodos de comunicación eran ahora extensiones de su propia UNIDAD DE VÍNCULO NEURONAL.",
+          "scriptParagraphs": [
+            3
+          ],
+          "transitionToNext": "zoom-in",
+          "transitionDuration": 0.7,
+          "kenBurnsStart": 1.04,
+          "kenBurnsEnd": 1.15,
+          "sentiment": "tension",
+          "contextNote": "tension-creciente",
+          "durationInFrames": 455
+        },
+        {
+          "imageFile": "3.png",
+          "textInclude": "Thorne no utilizaba la policía para pacificar a la población. Utilizaba la TEORÍA DEL EMPUJONCITO a una escala masiva y algorítmica.",
+          "scriptParagraphs": [
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10
+          ],
+          "transitionToNext": "fade",
+          "transitionDuration": 1,
+          "kenBurnsStart": 1,
+          "kenBurnsEnd": 1.06,
+          "sentiment": "calm",
+          "contextNote": "introduccion-calma",
+          "durationInFrames": 318
+        },
+        {
+          "imageFile": "4.png",
+          "textInclude": "Mediante micro-ajustes en la frecuencia de iluminación LED de las calles y frecuencias de radio subsónicas emitidas por sus drones Thorne manipulaba los niveles de dopamina y cortisol de los ciudadanos. El resultado era una HOMEOSTASIS SOCIAL perfecta. La tasa de criminalidad cayó al cero por ciento porque la población había perdido la voluntad neuroquímica de romper las reglas.",
+          "scriptParagraphs": [
+            11
+          ],
+          "transitionToNext": "zoom-out",
+          "transitionDuration": 1.1,
+          "kenBurnsStart": 1.03,
+          "kenBurnsEnd": 1.12,
+          "sentiment": "despair",
+          "contextNote": "desesperacion",
+          "durationInFrames": 788
+        },
+        {
+          "imageFile": "5.png",
+          "textInclude": "Para Thorne Vlatava era un Lazo Cerrado donde la ENTROPÍA DE SHANNON se aproximaba finalmente a cero.",
+          "scriptParagraphs": [
+            12,
+            13,
+            14,
+            15
+          ],
+          "transitionToNext": "slide-right",
+          "transitionDuration": 1,
+          "kenBurnsStart": 1,
+          "kenBurnsEnd": 1.06,
+          "sentiment": "calm",
+          "contextNote": "introduccion-calma",
+          "durationInFrames": 200
+        }
+      ]
+    },
+    {
+      "chapterIndex": 5,
+      "images": [
+        {
+          "imageFile": "1.png",
+          "textInclude": "A través de los lentes multiespectrales de sus Vectores de Inercia Thorne observaba el procesador urbano que había creado. Los ciudadanos de Vlatava se desplazaban como ciclos de Unidad Central de Procesamiento optimizados. Pero el Motor Determinista detectó una anomalía no cuantificable. El silencio de la creatividad. La población había entrado en un BEHAVIORAL SINK absoluto. Al eliminar el conflicto Thorne había eliminado la chispa de la voluntad. La gente había dejado de protestar. Pero también de crear. De sentir. Eran una ciudad zombie que funcionaba con una eficiencia perfecta. Pero que se sentía biológicamente muerta.",
+          "scriptParagraphs": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11
+          ],
+          "transitionToNext": "fade",
+          "transitionDuration": 1,
+          "kenBurnsStart": 1,
+          "kenBurnsEnd": 1.06,
+          "sentiment": "dread",
+          "contextNote": "introduccion-calma",
+          "durationInFrames": 1320
+        },
+        {
+          "imageFile": "2.png",
+          "textInclude": "Mientras tanto en la soledad gélida de su laboratorio la necedad de Thorne chocaba contra su propia limitación física.",
+          "scriptParagraphs": [
+            12
+          ],
+          "transitionToNext": "fade",
+          "transitionDuration": 1.2,
+          "kenBurnsStart": 1.1,
+          "kenBurnsEnd": 1,
+          "sentiment": "mystery",
+          "contextNote": "resolucion",
+          "durationInFrames": 299
+        },
+        {
+          "imageFile": "3.png",
+          "textInclude": "El Exo-Resonador de Fase Uno seguía estancado en el SETENTA POR CIENTO de eficiencia. La latencia de milisegundos era una CÁRCEL DE CÓDIGO.",
+          "scriptParagraphs": [
+            13,
+            14,
+            15
+          ],
+          "transitionToNext": "fade",
+          "transitionDuration": 1,
+          "kenBurnsStart": 1,
+          "kenBurnsEnd": 1.06,
+          "sentiment": "despair",
+          "contextNote": "introduccion-calma",
+          "durationInFrames": 303
+        },
+        {
+          "imageFile": "4.png",
+          "textInclude": "Frustrado Thorne ajustó su algoritmo. La paz absoluta era insostenible sin una ilusión sensorial perfecta. Vlatava había sido un éxito técnico.",
+          "scriptParagraphs": [
+            15
+          ],
+          "transitionToNext": "fade",
+          "transitionDuration": 0.8,
+          "kenBurnsStart": 1,
+          "kenBurnsEnd": 1.08,
+          "sentiment": "dread",
+          "contextNote": "extra image, merged with last group",
+          "durationInFrames": 321
+        },
+        {
+          "imageFile": "5.png",
+          "textInclude": "Y Thorne listo para proyectar su imagen de VADER ELEGANTE al mundo comenzó a preparar su ascenso. Con la mirada puesta en el Cáncer de la Estadística que representaba La Tercera Ciudad.",
+          "scriptParagraphs": [
+            15
+          ],
+          "transitionToNext": "fade",
+          "transitionDuration": 0.8,
+          "kenBurnsStart": 1,
+          "kenBurnsEnd": 1.08,
+          "sentiment": "dread",
+          "contextNote": "extra image, merged with last group",
+          "durationInFrames": 402
+        }
+      ]
+    },
+    {
+      "chapterIndex": 6,
+      "images": [
+        {
+          "imageFile": "1.png",
+          "textInclude": "La Tercera Ciudad no era un lugar. Era un ecosistema de privilegios blindado por FIREWALLS DE ORO. Para Thorne estos millonarios no eran personas. Eran variables que habían manipulado el sistema para su propio beneficio. Los mismos que optimizaron los protocolos de seguridad que consumieron a su familia.",
+          "scriptParagraphs": [
+            0,
+            1,
+            2
+          ],
+          "transitionToNext": "slide-right",
+          "transitionDuration": 1,
+          "kenBurnsStart": 1,
+          "kenBurnsEnd": 1.06,
+          "sentiment": "calm",
+          "contextNote": "introduccion-calma",
+          "durationInFrames": 663
+        },
+        {
+          "imageFile": "2.png",
+          "textInclude": "Batman no llegó a la Tercera Ciudad por casualidad. Su investigación en Vlatava le había revelado una verdad aterradora. La paz absoluta de Thorne era una ILUSIÓN SENSORIAL mantenida mediante micro-ajustes en la dopamina.",
+          "scriptParagraphs": [
+            3
+          ],
+          "transitionToNext": "flash",
+          "transitionDuration": 0.4,
+          "kenBurnsStart": 1.04,
+          "kenBurnsEnd": 1.15,
+          "sentiment": "drama",
+          "contextNote": "sostenido-drama",
+          "durationInFrames": 441
+        },
+        {
+          "imageFile": "3.png",
+          "textInclude": "Thorne estaba apagando la ciudad desde adentro. Pero no con explosivos. Utilizando el Realismo Maquiavélico Thorne comenzó a DESINSTALAR a la élite. En segundos cuentas bancarias fueron vaciadas. Identidades legales borradas.",
+          "scriptParagraphs": [
+            4
+          ],
+          "transitionToNext": "zoom-out",
+          "transitionDuration": 1.2,
+          "kenBurnsStart": 1,
+          "kenBurnsEnd": 1.06,
+          "sentiment": "calm",
+          "contextNote": "introduccion-calma",
+          "durationInFrames": 546
+        },
+        {
+          "imageFile": "4.png",
+          "textInclude": "Secretos corporativos filtrados a la red convirtiendo a los hombres más poderosos de la ciudad en FANTASMAS DIGITALES sin acceso a sus propias mansiones automatizadas.",
+          "scriptParagraphs": [
+            5
+          ],
+          "transitionToNext": "fade",
+          "transitionDuration": 1.1,
+          "kenBurnsStart": 1.02,
+          "kenBurnsEnd": 1.1,
+          "sentiment": "mystery",
+          "contextNote": "misterio-intriga",
+          "durationInFrames": 330
+        },
+        {
+          "imageFile": "5.png",
+          "textInclude": "Batman observaba desde las sombras consciente de la trampa existencial. Si golpeaba a Thorne el mundo vería a un vigilante atacando a un Premio Nobel de la Paz. Thorne había ganado este tablero estratégico.",
+          "scriptParagraphs": [
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14
+          ],
+          "transitionToNext": "crossfade",
+          "transitionDuration": 1.2,
+          "kenBurnsStart": 1,
+          "kenBurnsEnd": 1.06,
+          "sentiment": "calm",
+          "contextNote": "introduccion-calma",
+          "durationInFrames": 431
+        }
+      ]
+    },
+    {
+      "chapterIndex": 7,
+      "images": [
+        {
+          "imageFile": "1.png",
+          "textInclude": "En las profundidades de la Tercera Ciudad Thorne había construido su LABORATORIO DEL DOLOR LATENTE. Una versión biomecánica de la empalación de Vlad Tercero. No buscaba la muerte. Para él la muerte era un cese de funciones demasiado SIMPLE y compasivo.",
+          "scriptParagraphs": [
+            0
+          ],
+          "transitionToNext": "glitch",
+          "transitionDuration": 0.5,
+          "kenBurnsStart": 1.04,
+          "kenBurnsEnd": 1.15,
+          "sentiment": "drama",
+          "contextNote": "sostenido-drama",
+          "durationInFrames": 560
+        },
+        {
+          "imageFile": "2.png",
+          "textInclude": "Thorne había capturado a los tres ejecutivos responsables de su tragedia y los había transformado en sus primeras MASCOTAS BIOMÉTRICAS.",
+          "scriptParagraphs": [
+            1,
+            2,
+            3,
+            4
+          ],
+          "transitionToNext": "fade",
+          "transitionDuration": 1,
+          "kenBurnsStart": 1,
+          "kenBurnsEnd": 1.06,
+          "sentiment": "calm",
+          "contextNote": "introduccion-calma",
+          "durationInFrames": 291
+        },
+        {
+          "imageFile": "3.png",
+          "textInclude": "Siguiendo su filosofía de que el dolor es un ERROR DE CÁLCULO había diseñado para ellos un entorno de Bio-feedback loops y Sensory Overload donde el sufrimiento era una constante matemática mantenida por algoritmos. Les impuso la misma cárcel de código que él vivía cada día. El retraso agónico entre el pensamiento y el movimiento. La desincronización motriz ETERNA. Sus mentes atrapadas en cuerpos que ya no les pertenecían sirviendo como procesadores orgánicos para sus pruebas de estrés sensorial.",
+          "scriptParagraphs": [
+            5
+          ],
+          "transitionToNext": "fade",
+          "transitionDuration": 0.8,
+          "kenBurnsStart": 1.04,
+          "kenBurnsEnd": 1.15,
+          "sentiment": "drama",
+          "contextNote": "sostenido-drama",
+          "durationInFrames": 1103
+        },
+        {
+          "imageFile": "4.png",
+          "textInclude": "Thorne observó su obra con un Efecto Vader absoluto. Mientras tanto en la superficie el mundo aclamaba a Silias Thorne. Premio Nobel de la Paz. Consultor global. SANTO TECNOCRÁTICO.",
+          "scriptParagraphs": [
+            6
+          ],
+          "transitionToNext": "3d-flip",
+          "transitionDuration": 0.9,
+          "kenBurnsStart": 1.04,
+          "kenBurnsEnd": 1.15,
+          "sentiment": "terror",
+          "contextNote": "tension-creciente",
+          "durationInFrames": 483
+        },
+        {
+          "imageFile": "5.png",
+          "textInclude": "Batman se quedó solo en la oscuridad comprendiendo la trampa. Si golpeaba a Thorne el mundo vería a un vigilante atacando a un santo.",
+          "scriptParagraphs": [
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17
+          ],
+          "transitionToNext": "3d-flip",
+          "transitionDuration": 1.5,
+          "kenBurnsStart": 1,
+          "kenBurnsEnd": 1.06,
+          "sentiment": "calm",
+          "contextNote": "introduccion-calma",
+          "durationInFrames": 311
+        }
+      ]
+    },
+    {
+      "chapterIndex": 8,
+      "images": [
+        {
+          "imageFile": "1.png",
+          "textInclude": "La ascensión de Silias Thorne al poder nacional no fue una conquista. Fue una entrega INEVITABLE por parte de una sociedad agotada por el caos.",
+          "scriptParagraphs": [
+            0
+          ],
+          "transitionToNext": "zoom-in",
+          "transitionDuration": 0.7,
+          "kenBurnsStart": 1.06,
+          "kenBurnsEnd": 1.18,
+          "sentiment": "triumph",
+          "contextNote": "triunfo-poder",
+          "durationInFrames": 299
+        },
+        {
+          "imageFile": "2.png",
+          "textInclude": "Tras la limpieza de la Tercera Ciudad y la erradicación del crimen en Vlatava el clamor popular exigió su regencia. Viéndolo como el primer líder POST-IDEOLÓGICO capaz de sustituir la política por una ingeniería social pura. Thorne aceptó el cargo no por ambición personal. Sino como un deber sistémico.",
+          "scriptParagraphs": [
+            1,
+            2
+          ],
+          "transitionToNext": "slide-right",
+          "transitionDuration": 1,
+          "kenBurnsStart": 1,
+          "kenBurnsEnd": 1.06,
+          "sentiment": "calm",
+          "contextNote": "introduccion-calma",
+          "durationInFrames": 669
+        },
+        {
+          "imageFile": "3.png",
+          "textInclude": "En las oficinas de Wayne Enterprises la colisión de los dos intelectos más grandes de la Tierra se materializó en un acuerdo de colaboración para la salud global. Thorne se presentó como el epítome del Vader Elegante. Un traje de tres piezas de corte asimétrico que ocultaba perfectamente la falta de su brazo izquierdo. Bruce Wayne observó la AUSENCIA TOTAL de tics. El parpadeo mínimo. La latencia nunca visible.",
+          "scriptParagraphs": [
+            3
+          ],
+          "transitionToNext": "zoom-out",
+          "transitionDuration": 1.3,
+          "kenBurnsStart": 1.1,
+          "kenBurnsEnd": 1,
+          "sentiment": "resolution",
+          "contextNote": "resolucion",
+          "durationInFrames": 839
+        },
+        {
+          "imageFile": "4.png",
+          "textInclude": "Batman detectó la aterradora austeridad de Thorne. El Doctor no buscaba lucro ni poder convencional. Lo que lo hacía INMUNE a cualquier forma de corrupción o ataque político tradicional.",
+          "scriptParagraphs": [
+            4,
+            5,
+            6,
+            7,
+            8
+          ],
+          "transitionToNext": "zoom-out",
+          "transitionDuration": 1.2,
+          "kenBurnsStart": 1,
+          "kenBurnsEnd": 1.06,
+          "sentiment": "calm",
+          "contextNote": "introduccion-calma",
+          "durationInFrames": 356
+        },
+        {
+          "imageFile": "5.png",
+          "textInclude": "Bajo el nuevo régimen la PAX THORNE comenzó a eliminar la pobreza y el crimen mediante una Arquitectura de Decisiones invisible. Donde la población elegía el orden no por miedo sino por una manipulación algorítmica del entorno que hacía que el error pareciera una opción estadísticamente IRRELEVANTE.",
+          "scriptParagraphs": [
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15
+          ],
+          "transitionToNext": "radial",
+          "transitionDuration": 0.7,
+          "kenBurnsStart": 1.04,
+          "kenBurnsEnd": 1.15,
+          "sentiment": "tension",
+          "contextNote": "tension-creciente",
+          "durationInFrames": 598
+        }
+      ]
+    },
+    {
+      "chapterIndex": 9,
+      "images": [
+        {
+          "imageFile": "1.png",
+          "textInclude": "Mientras la nación celebraba una era de prosperidad sin precedentes Bruce Wayne regresó a las sombras de Vlatava para AUDITAR el costo humano de la perfección. Lo que encontró fue un Behavioral Sink absoluto. Una ciudad donde las casas estaban llenas de individuos con una MUERTE DE VOLUNTAD. Personas que habían dejado de innovar amar o luchar. Porque el sistema ya había pre-calculado CADA UNA de sus necesidades. El rastro físico del MAQUIAVELISMO DIGITAL de Thorne se reveló finalmente. Frecuencias subsónicas integradas en la red eléctrica. Micro-ajustes en los niveles de dopamina y cortisol a través del suministro de agua.",
+          "scriptParagraphs": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5
+          ],
+          "transitionToNext": "3d-flip",
+          "transitionDuration": 1.5,
+          "kenBurnsStart": 1,
+          "kenBurnsEnd": 1.06,
+          "sentiment": "dread",
+          "contextNote": "introduccion-calma",
+          "durationInFrames": 1265
+        },
+        {
+          "imageFile": "2.png",
+          "textInclude": "En ese momento Thorne contactó a Batman a través de un canal cifrado. \"Vlatava es pacífica, Bruce. La justicia analógica es un FALLO DE SEGMENTACIÓN.\"",
+          "scriptParagraphs": [
+            6
+          ],
+          "transitionToNext": "3d-flip",
+          "transitionDuration": 1.6,
+          "kenBurnsStart": 1.1,
+          "kenBurnsEnd": 1,
+          "sentiment": "mystery",
+          "contextNote": "resolucion",
+          "durationInFrames": 325
+        },
+        {
+          "imageFile": "3.png",
+          "textInclude": "Batman rodeado por el silencio sepulcral de una población sin alma comprendió que Thorne no buscaba la tiranía mediante el miedo. Sino la esclavitud mediante el bienestar. Su respuesta fue el silencio del Bug necesario. Batman aceptó su papel como la VARIABLE X IRRACIONAL que evitaría que el mundo de cristal perfecto de Thorne se convirtiera en una NECRÓPOLIS DE ORDEN ABSOLUTO.",
+          "scriptParagraphs": [
+            7
+          ],
+          "transitionToNext": "fade",
+          "transitionDuration": 1,
+          "kenBurnsStart": 1,
+          "kenBurnsEnd": 1.06,
+          "sentiment": "despair",
+          "contextNote": "introduccion-calma",
+          "durationInFrames": 788
+        }
+      ]
+    },
+    {
+      "chapterIndex": 10,
+      "images": [
+        {
+          "imageFile": "1.png",
+          "textInclude": "Gotham City el Cáncer de la Estadística comenzó a experimentar un fenómeno aterrador. La paz absoluta.",
+          "scriptParagraphs": [
+            0,
+            1
+          ],
+          "transitionToNext": "fade",
+          "transitionDuration": 1,
+          "kenBurnsStart": 1,
+          "kenBurnsEnd": 1.06,
+          "sentiment": "calm",
+          "contextNote": "introduccion-calma",
+          "durationInFrames": 269
+        },
+        {
+          "imageFile": "2.png",
+          "textInclude": "Thorne inició la fase de normalización infiltrando su MOTOR DETERMINISTA en los servidores del Departamento de Policía de Gotham City y los sistemas de contención del Asilo Arkham. Utilizando la ENTROPÍA DE LA INFORMACIÓN DE SHANNON Thorne identificó los patrones de criminalidad antes de que se manifestaran. La ciudad antes vibrante de caos y desesperación se sumió en una FRIALDAD CLÍNICA.",
+          "scriptParagraphs": [
+            2
+          ],
+          "transitionToNext": "fade",
+          "transitionDuration": 1.2,
+          "kenBurnsStart": 1.1,
+          "kenBurnsEnd": 1,
+          "sentiment": "resolution",
+          "contextNote": "resolucion",
+          "durationInFrames": 799
+        },
+        {
+          "imageFile": "3.png",
+          "textInclude": "Pero Batman activó sus Protocolos de Contingencia al detectar el ruido invisible del algoritmo en la red eléctrica. Se desató un duelo de sistemas SIN PRECEDENTES. La Bat-computadora lanzó contra-medidas analógicas y criptografía cuántica para sabotear el control de lazo cerrado de Thorne. La frustración de Thorne creció al procesar los datos de Batman. El Caballero de la Noche se manifestaba como una ANOMALÍA MATEMÁTICA. Una variable X irracional que desafiaba la lógica del Motor Determinista.",
+          "scriptParagraphs": [
+            3,
+            4,
+            5
+          ],
+          "transitionToNext": "slide-right",
+          "transitionDuration": 1,
+          "kenBurnsStart": 1,
+          "kenBurnsEnd": 1.06,
+          "sentiment": "calm",
+          "contextNote": "introduccion-calma",
+          "durationInFrames": 1016
+        },
+        {
+          "imageFile": "4.png",
+          "textInclude": "Gotham se transformó en un TABLERO DE AJEDREZ TECNOCRÁTICO donde cada transformador eléctrico y cada cámara de seguridad eran piezas en una guerra de desgaste intelectual. Entre el orden absoluto. Y el caos necesario.",
+          "scriptParagraphs": [
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16
+          ],
+          "transitionToNext": "zoom-blur",
+          "transitionDuration": 0.6,
+          "kenBurnsStart": 1.04,
+          "kenBurnsEnd": 1.15,
+          "sentiment": "tension",
+          "contextNote": "tension-creciente",
+          "durationInFrames": 471
+        }
+      ]
+    },
+    {
+      "chapterIndex": 11,
+      "images": [
+        {
+          "imageFile": "1.png",
+          "textInclude": "Batman rastreó el pulso de datos hasta una instalación de Thorne Biomechanics. Donde el Doctor Silias Thorne lo esperaba. La escena exudaba un EFECTO VADER ABSOLUTO. Thorne envuelto en un traje de tres piezas asimétrico dejó al descubierto su brazo biomecánico. Una extensión modular de sus drones. Su exoesqueleto de fibra de carbono zumbando con una FRECUENCIA SUBSÓNICA. Rodeado por sus Vectores de Inercia que se movían como esculturas cinéticas de metal líquido",
+          "scriptParagraphs": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13
+          ],
+          "transitionToNext": "slide-right",
+          "transitionDuration": 1,
+          "kenBurnsStart": 1,
+          "kenBurnsEnd": 1.06,
+          "sentiment": "dread",
+          "contextNote": "introduccion-calma",
+          "durationInFrames": 988
+        },
+        {
+          "imageFile": "2.png",
+          "textInclude": "Thorne proyectó un silencio absoluto que activó el CONGELAMIENTO BIOLÓGICO en los sentidos del murciélago.",
+          "scriptParagraphs": [
+            14,
+            15,
+            16,
+            17
+          ],
+          "transitionToNext": "fade",
+          "transitionDuration": 1,
+          "kenBurnsStart": 1,
+          "kenBurnsEnd": 1.06,
+          "sentiment": "drama",
+          "contextNote": "introduccion-calma",
+          "durationInFrames": 189
+        },
+        {
+          "imageFile": "3.png",
+          "textInclude": "El debate que siguió no fue una disputa de odio. Sino una DISECCIÓN IDEOLÓGICA. \"Bruce tu justicia es una venda en una herida mortal. Yo soy la ARQUITECTURA DE LA CURA.\" Batman respondió con la filosofía del Bug necesario. El derecho a fallar. El libre albedrío como esencia de la humanidad. El mundo de Thorne como una PRISIÓN SIN MUROS.",
+          "scriptParagraphs": [
+            17
+          ],
+          "transitionToNext": "fade",
+          "transitionDuration": 0.8,
+          "kenBurnsStart": 1,
+          "kenBurnsEnd": 1.08,
+          "sentiment": "tension",
+          "contextNote": "extra image, merged with last group",
+          "durationInFrames": 743
+        },
+        {
+          "imageFile": "4.png",
+          "textInclude": "La necedad humana de Thorne herida por la resistencia de Batman a ser optimizado hizo que perdiera el control táctico.",
+          "scriptParagraphs": [
+            17
+          ],
+          "transitionToNext": "fade",
+          "transitionDuration": 0.8,
+          "kenBurnsStart": 1,
+          "kenBurnsEnd": 1.08,
+          "sentiment": "drama",
+          "contextNote": "extra image, merged with last group",
+          "durationInFrames": 222
+        },
+        {
+          "imageFile": "5.png",
+          "textInclude": "El combate fue una danza de precisión contra improvisación.",
+          "scriptParagraphs": [
+            17
+          ],
+          "transitionToNext": "fade",
+          "transitionDuration": 0.8,
+          "kenBurnsStart": 1,
+          "kenBurnsEnd": 1.08,
+          "sentiment": "drama",
+          "contextNote": "extra image, merged with last group",
+          "durationInFrames": 124
+        },
+        {
+          "imageFile": "6.png",
+          "textInclude": "Terminó en EMPATE TÉCNICO.",
+          "scriptParagraphs": [
+            17
+          ],
+          "transitionToNext": "fade",
+          "transitionDuration": 0.8,
+          "kenBurnsStart": 1,
+          "kenBurnsEnd": 1.08,
+          "sentiment": "rage",
+          "contextNote": "extra image, merged with last group",
+          "durationInFrames": 58
+        },
+        {
+          "imageFile": "7.png",
+          "textInclude": "Thorne ordenó la retirada estratégica. Batman regresó a la Bat-cueva herido. Comprendiendo que Thorne era su REFLEJO OSCURO.",
+          "scriptParagraphs": [
+            17
+          ],
+          "transitionToNext": "fade",
+          "transitionDuration": 0.8,
+          "kenBurnsStart": 1,
+          "kenBurnsEnd": 1.08,
+          "sentiment": "resolution",
+          "contextNote": "extra image, merged with last group",
+          "durationInFrames": 268
+        }
+      ]
+    }
+  ]
+}

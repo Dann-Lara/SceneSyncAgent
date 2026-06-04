@@ -38,7 +38,7 @@ const OutroPlayer: React.FC<{
   videoPath?: string;
 }> = ({ duration, style, videoPath }) => {
   const frame = useCurrentFrame();
-  return <Outro duration={duration} channelStyle={style} videoPath={videoPath} currentFrame={frame} />;
+  return <Outro duration={duration} channelStyle={style} videoPath={videoPath} />;
 };
 
 export const Main: React.FC<VideoInput & Record<string, unknown>> = ({

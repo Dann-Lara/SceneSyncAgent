@@ -1,4 +1,5 @@
 import { interpolate, useCurrentFrame } from "remotion";
+import { useMemo } from "react";
 import type { ChannelStyle } from "../types";
 import { KineticText } from "./KineticText";
 import { ParticleOverlay } from "./ParticleOverlay";
@@ -10,12 +11,14 @@ interface IntroProps {
   videoPath?: string;
 }
 
+const HEX_CHARS = "0123456789ABCDEF";
+
 function RedactedLines({ color, opacity }: { color: string; opacity: number }) {
   const lines = [
-    { w: "62%", y: "19%", indent: "8%" },
-    { w: "78%", y: "23%", indent: "8%" },
+    { w: "62%", y: "19%", indent: "8%", redacted: false },
+    { w: "78%", y: "23%", indent: "8%", redacted: false },
     { w: "45%", y: "27%", indent: "8%", redacted: true },
-    { w: "70%", y: "31%", indent: "8%" },
+    { w: "70%", y: "31%", indent: "8%", redacted: false },
     { w: "55%", y: "35%", indent: "8%", redacted: true },
   ];
   return (
@@ -39,17 +42,69 @@ function RedactedLines({ color, opacity }: { color: string; opacity: number }) {
   );
 }
 
+// Secuencia de acceso tipo terminal
+function AccessSequence({ progress, color }: { progress: number; color: string }) {
+  const lines = [
+    "INICIANDO PROTOCOLO DE ACCESO...",
+    "NIVEL: MÁXIMO CLASIFICADO",
+    "VERIFICANDO... ████████████ 100%",
+    "ACCESO CONCEDIDO",
+  ];
+  const visibleLines = Math.floor(progress * (lines.length + 1));
+
+  return (
+    <div
+      style={{
+        position: "absolute",
+        inset: 0,
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
+        alignItems: "flex-start",
+        padding: "0 12%",
+        opacity: interpolate(progress, [0, 0.1, 0.8, 1], [0, 1, 1, 0]),
+        zIndex: 5,
+        pointerEvents: "none",
+      }}
+    >
+      {lines.slice(0, visibleLines).map((line, i) => (
+        <div
+          key={i}
+          style={{
+            color: i === lines.length - 1 ? "#ffffff" : `${color}cc`,
+            fontSize: i === lines.length - 1 ? 16 : 13,
+            fontFamily: "'Courier New', monospace",
+            letterSpacing: i === lines.length - 1 ? 6 : 3,
+            fontWeight: i === lines.length - 1 ? 700 : 400,
+            marginBottom: 10,
+            textShadow: `0 0 20px ${color}88`,
+            textTransform: "uppercase",
+          }}
+        >
+          {i === lines.length - 1 ? "▶ " : "  "}{line}
+        </div>
+      ))}
+    </div>
+  );
+}
+
 export const Intro: React.FC<IntroProps> = ({ duration, channelStyle }) => {
   const frame = useCurrentFrame();
   const progress = duration > 0 ? frame / duration : 0;
-  const FPS = 30;
+
+  // Access sequence cubre primeros 25% del Intro
+  const accessProgress = interpolate(progress, [0, 0.22], [0, 1], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+  });
+  const showAccessSeq = progress < 0.26;
 
   const hookFlash = interpolate(frame, [0, 3, 8], [1, 0.6, 0], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
   });
 
-  const titleReveal = interpolate(progress, [0.05, 0.18], [0, 1], {
+  const titleReveal = interpolate(progress, [0.22, 0.36], [0, 1], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
   });
@@ -59,7 +114,7 @@ export const Intro: React.FC<IntroProps> = ({ duration, channelStyle }) => {
   });
   const titleOpacity = Math.min(titleReveal, titleFadeOut);
 
-  const scrambleProgress = interpolate(progress, [0.05, 0.22], [0, 1], {
+  const scrambleProgress = interpolate(progress, [0.22, 0.38], [0, 1], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
   });
@@ -68,7 +123,7 @@ export const Intro: React.FC<IntroProps> = ({ duration, channelStyle }) => {
     ? Math.sin(frame * 11.3) * (1 - scrambleProgress) * 6
     : 0;
 
-  const channelReveal = interpolate(progress, [0.32, 0.52], [0, 1], {
+  const channelReveal = interpolate(progress, [0.38, 0.54], [0, 1], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
   });
@@ -76,12 +131,12 @@ export const Intro: React.FC<IntroProps> = ({ duration, channelStyle }) => {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
   });
-  const channelY = interpolate(progress, [0.32, 0.52], [24, 0], {
+  const channelY = interpolate(progress, [0.38, 0.54], [24, 0], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
   });
 
-  const lineGrow = interpolate(progress, [0.28, 0.48], [0, 1], {
+  const lineGrow = interpolate(progress, [0.34, 0.52], [0, 1], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
   });
@@ -102,12 +157,19 @@ export const Intro: React.FC<IntroProps> = ({ duration, channelStyle }) => {
     extrapolateRight: "clamp",
   });
 
-  const bracketOpacity = interpolate(progress, [0.18, 0.32], [0, 0.7], {
+  const bracketOpacity = interpolate(progress, [0.24, 0.36], [0, 0.7], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
   });
 
   const noiseFlicker = frame % 5 < 1 ? 0.04 : 0.02;
+
+  // Hex data stream grid — determinista, sin Math.random()
+  const hexGrid = Array.from({ length: 32 }, (_, r) =>
+    Array.from({ length: 52 }, (_, c) =>
+      HEX_CHARS[(r * 7 + c * 13 + 42) % 16]
+    ).join(" ")
+  );
 
   return (
     <div
@@ -124,6 +186,7 @@ export const Intro: React.FC<IntroProps> = ({ duration, channelStyle }) => {
         overflow: "hidden",
       }}
     >
+      {/* Noise grain */}
       <div
         style={{
           position: "absolute",
@@ -134,6 +197,32 @@ export const Intro: React.FC<IntroProps> = ({ duration, channelStyle }) => {
         }}
       />
 
+      {/* HEX DATA STREAM — fondo animado */}
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          overflow: "hidden",
+          opacity: 0.04,
+          pointerEvents: "none",
+        }}
+      >
+        <div
+          style={{
+            transform: `translateY(-${(frame * 0.3) % 540}px)`,
+            fontFamily: "'Courier New', monospace",
+            fontSize: 11,
+            color: channelStyle.primaryColor,
+            lineHeight: "20px",
+            letterSpacing: "2px",
+            padding: "0 4px",
+          }}
+        >
+          {hexGrid.map((row, i) => <div key={i}>{row}</div>)}
+        </div>
+      </div>
+
+      {/* Vignette */}
       <div
         style={{
           position: "absolute",
@@ -144,6 +233,7 @@ export const Intro: React.FC<IntroProps> = ({ duration, channelStyle }) => {
         }}
       />
 
+      {/* Scan line */}
       <div
         style={{
           position: "absolute",
@@ -171,6 +261,12 @@ export const Intro: React.FC<IntroProps> = ({ duration, channelStyle }) => {
         opacity={interpolate(progress, [0.2, 0.4, 0.8, 1], [0, 0.8, 0.8, 0])}
       />
 
+      {/* Secuencia de acceso terminal */}
+      {showAccessSeq && (
+        <AccessSequence progress={accessProgress} color={channelStyle.primaryColor} />
+      )}
+
+      {/* Sello CLASIFICADO */}
       <div
         style={{
           position: "absolute",
@@ -199,6 +295,7 @@ export const Intro: React.FC<IntroProps> = ({ duration, channelStyle }) => {
         </div>
       </div>
 
+      {/* Corner brackets */}
       {[
         { top: "18%", left: "6%", borderTop: true, borderLeft: true },
         { top: "18%", right: "6%", borderTop: true, borderRight: true },
@@ -221,6 +318,7 @@ export const Intro: React.FC<IntroProps> = ({ duration, channelStyle }) => {
         />
       ))}
 
+      {/* Glow radial */}
       <div
         style={{
           position: "absolute",
@@ -235,6 +333,7 @@ export const Intro: React.FC<IntroProps> = ({ duration, channelStyle }) => {
         }}
       />
 
+      {/* TÍTULO con backdrop */}
       <div
         style={{
           position: "absolute",
@@ -247,30 +346,43 @@ export const Intro: React.FC<IntroProps> = ({ duration, channelStyle }) => {
           textAlign: "center",
         }}
       >
+        {/* Backdrop semitransparente — mejora legibilidad sobre cualquier imagen de fondo */}
         <div
           style={{
-            color: "#ffffff",
-            fontSize: 72,
-            fontWeight: 900,
-            lineHeight: 1.15,
-            letterSpacing: -1,
-            fontFamily: "'Limelight', serif",
-            textShadow: `0 2px 40px rgba(0,0,0,0.8), 0 0 60px ${channelStyle.primaryColor}33`,
-            position: "relative",
-            zIndex: 2,
+            display: "inline-block",
+            background: "rgba(0,0,0,0.55)",
+            backdropFilter: "blur(12px)",
+            padding: "28px 48px",
+            borderRadius: 8,
+            border: `1px solid ${channelStyle.primaryColor}22`,
           }}
         >
-          <KineticText
-            text={channelStyle.videoTitle}
-            frame={frame}
-            startFrame={Math.floor(duration * 0.05)}
-            wordsPerSecond={3}
-            animation="pop"
-            style={{ justifyContent: "center" }}
-          />
+          <div
+            style={{
+              color: "#ffffff",
+              fontSize: 72,
+              fontWeight: 900,
+              lineHeight: 1.15,
+              letterSpacing: -1,
+              fontFamily: channelStyle.fontFamily,
+              textShadow: `0 4px 40px rgba(0,0,0,0.8), 0 0 80px ${channelStyle.primaryColor}22`,
+              position: "relative",
+              zIndex: 2,
+            }}
+          >
+            <KineticText
+              text={channelStyle.videoTitle}
+              frame={frame}
+              startFrame={Math.floor(duration * 0.22)}
+              wordsPerSecond={3}
+              animation="pop"
+              style={{ justifyContent: "center" }}
+            />
+          </div>
         </div>
       </div>
 
+      {/* Línea divisora */}
       <div
         style={{
           position: "absolute",
@@ -283,6 +395,7 @@ export const Intro: React.FC<IntroProps> = ({ duration, channelStyle }) => {
         }}
       />
 
+      {/* Nombre del canal */}
       <div
         style={{
           position: "absolute",
@@ -301,7 +414,7 @@ export const Intro: React.FC<IntroProps> = ({ duration, channelStyle }) => {
             letterSpacing: 8,
             textTransform: "uppercase",
             fontWeight: 500,
-            fontFamily: "'Limelight', serif",
+            fontFamily: channelStyle.fontFamily,
             textShadow: `0 0 30px ${channelStyle.primaryColor}aa, 0 2px 4px rgba(0,0,0,0.8)`,
           }}
         >
@@ -309,6 +422,7 @@ export const Intro: React.FC<IntroProps> = ({ duration, channelStyle }) => {
         </div>
       </div>
 
+      {/* BlueLightLeak entrada */}
       <div
         style={{
           position: "absolute",
@@ -321,6 +435,7 @@ export const Intro: React.FC<IntroProps> = ({ duration, channelStyle }) => {
         <BlueLightLeak durationInFrames={Math.floor(duration * 0.15)} seed={0} color={channelStyle.primaryColor} />
       </div>
 
+      {/* BlueLightLeak salida */}
       <div
         style={{
           position: "absolute",
@@ -333,6 +448,7 @@ export const Intro: React.FC<IntroProps> = ({ duration, channelStyle }) => {
         <BlueLightLeak durationInFrames={Math.floor(duration * 0.3)} seed={3} color={channelStyle.primaryColor} />
       </div>
 
+      {/* Hook flash inicial */}
       <div
         style={{
           position: "absolute",
@@ -344,6 +460,7 @@ export const Intro: React.FC<IntroProps> = ({ duration, channelStyle }) => {
         }}
       />
 
+      {/* Fade-out final */}
       <div
         style={{
           position: "absolute",

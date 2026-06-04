@@ -1,4 +1,4 @@
-import { interpolate, spring, useCurrentFrame, useVideoConfig } from "remotion";
+import { interpolate, useCurrentFrame, useVideoConfig } from "remotion";
 import type { Sentiment } from "../types";
 import { useMemo } from "react";
 
@@ -13,15 +13,15 @@ export const SceneOverlays: React.FC<SceneOverlaysProps> = ({ sentiment, color }
 
   const main = (() => {
     switch (sentiment) {
-      case "calm": return <DataGrid frame={frame} fps={fps} width={width} height={height} color={color} />;
-      case "mystery": return <WhisperingEcho frame={frame} fps={fps} width={width} height={height} color={color} />;
-      case "tension": return <TargetingReticle frame={frame} fps={fps} width={width} height={height} color={color} />;
-      case "dread": return <SlowGaze frame={frame} fps={fps} width={width} height={height} color={color} />;
-      case "drama": return <EMPPulse frame={frame} fps={fps} width={width} height={height} color={color} />;
-      case "despair": return <FallingAshes frame={frame} fps={fps} width={width} height={height} color={color} />;
-      case "rage": return <FractureLightning frame={frame} fps={fps} width={width} height={height} color={color} />;
-      case "terror": return <GlitchReticle frame={frame} fps={fps} width={width} height={height} color={color} />;
-      case "triumph": return <AscendingPulse frame={frame} fps={fps} width={width} height={height} color={color} />;
+      case "calm":       return <DataGrid frame={frame} fps={fps} width={width} height={height} color={color} />;
+      case "mystery":    return <NeuralPulse frame={frame} fps={fps} width={width} height={height} color={color} />;
+      case "tension":    return <TargetingReticle frame={frame} fps={fps} width={width} height={height} color={color} />;
+      case "dread":      return <SlowGaze frame={frame} fps={fps} width={width} height={height} color={color} />;
+      case "drama":      return <EMPPulse frame={frame} fps={fps} width={width} height={height} color={color} />;
+      case "despair":    return <FallingAshes frame={frame} fps={fps} width={width} height={height} color={color} />;
+      case "rage":       return <FractureLightning frame={frame} fps={fps} width={width} height={height} color={color} />;
+      case "terror":     return <GlitchReticle frame={frame} fps={fps} width={width} height={height} color={color} />;
+      case "triumph":    return <AscendingPulse frame={frame} fps={fps} width={width} height={height} color={color} />;
       case "resolution": return <WaveformDecay frame={frame} fps={fps} width={width} height={height} color={color} />;
     }
   })();
@@ -44,9 +44,19 @@ type OverlayProps = {
   color: string;
 };
 
+// ─── CALM: DataGrid con data burst ocasional ─────────────────────────────────
 const DataGrid: React.FC<OverlayProps> = ({ frame, width, height, color }) => {
   const scanY = ((frame * 2) % height);
   const gridOpacity = interpolate(frame % 120, [0, 60, 120], [0.18, 0.35, 0.18]);
+
+  // Data burst: cada ~120 frames, 3-4 puntos brillan
+  const burstPoints = useMemo(() =>
+    Array.from({ length: 4 }, (_, i) => ({
+      x: width * ((i * 31 + 17) % 80) / 100 + 40,
+      y: height * ((i * 47 + 11) % 80) / 100 + 40,
+      phase: i * 28,
+    })), [width, height]);
+
   return (
     <svg viewBox={`0 0 ${width} ${height}`} style={overlayStyle}>
       <defs>
@@ -57,47 +67,121 @@ const DataGrid: React.FC<OverlayProps> = ({ frame, width, height, color }) => {
       </defs>
       <rect width={width} height={height} fill="url(#grid)" opacity={gridOpacity} />
       <line x1={0} y1={scanY} x2={width} y2={scanY} stroke={color} strokeWidth={1} opacity={0.35} />
-    </svg>
-  );
-};
-
-const WhisperingEcho: React.FC<OverlayProps> = ({ frame, width, height, color }) => {
-  const cx = width / 2;
-  const cy = height / 2;
-  const maxR = Math.sqrt(width * width + height * height) / 2;
-  const rings = 3;
-  return (
-    <svg viewBox={`0 0 ${width} ${height}`} style={overlayStyle}>
-      {Array.from({ length: rings }).map((_, i) => {
-        const phase = (frame * 0.3 + i * 80) % 160;
-        const r = interpolate(phase, [0, 160], [0, maxR * 0.6]);
-        const opacity = interpolate(phase, [0, 40, 120, 160], [0, 0.35, 0.28, 0]);
-        const strokeW = interpolate(phase, [0, 80, 160], [2, 0.5, 0]);
+      {burstPoints.map((p, i) => {
+        const t = (frame + p.phase) % 120;
+        const burstOpacity = t < 12 ? interpolate(t, [0, 4, 12], [0, 0.7, 0]) : 0;
         return (
-          <circle
-            key={i}
-            cx={cx}
-            cy={cy}
-            r={r}
-            fill="none"
-            stroke={color}
-            strokeWidth={strokeW}
-            opacity={opacity}
-          />
+          <circle key={i} cx={p.x} cy={p.y} r={4 + t * 0.5} fill="none"
+            stroke={color} strokeWidth={1} opacity={burstOpacity} />
         );
       })}
     </svg>
   );
 };
 
+// ─── MYSTERY: NeuralPulse — red neuronal con pulsos viajando ─────────────────
+const NeuralPulse: React.FC<OverlayProps> = ({ frame, width, height, color }) => {
+  const nodes = useMemo(() => [
+    { x: width * 0.15, y: height * 0.25 },
+    { x: width * 0.35, y: height * 0.15 },
+    { x: width * 0.60, y: height * 0.20 },
+    { x: width * 0.80, y: height * 0.35 },
+    { x: width * 0.75, y: height * 0.65 },
+    { x: width * 0.50, y: height * 0.80 },
+    { x: width * 0.22, y: height * 0.70 },
+    { x: width * 0.45, y: height * 0.48 },
+  ], [width, height]);
+
+  // Conexiones entre nodos cercanos (distancia < 380px)
+  const edges = useMemo(() => {
+    const result: { a: number; b: number; dist: number }[] = [];
+    for (let i = 0; i < nodes.length; i++) {
+      for (let j = i + 1; j < nodes.length; j++) {
+        const dx = nodes[i].x - nodes[j].x;
+        const dy = nodes[i].y - nodes[j].y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < 380) result.push({ a: i, b: j, dist });
+      }
+    }
+    return result;
+  }, [nodes]);
+
+  return (
+    <svg viewBox={`0 0 ${width} ${height}`} style={overlayStyle}>
+      {/* Conexiones */}
+      {edges.map((e, i) => {
+        const edgeOpacity = 0.12 + Math.sin(frame * 0.02 + i * 1.3) * 0.06;
+        return (
+          <line key={i}
+            x1={nodes[e.a].x} y1={nodes[e.a].y}
+            x2={nodes[e.b].x} y2={nodes[e.b].y}
+            stroke={color} strokeWidth={0.7} opacity={edgeOpacity} />
+        );
+      })}
+
+      {/* Pulsos viajando por las conexiones */}
+      {edges.map((e, i) => {
+        const speed = 0.4 + (i % 3) * 0.15;
+        const t = ((frame * speed + i * 40) % 100) / 100;
+        const px = nodes[e.a].x + (nodes[e.b].x - nodes[e.a].x) * t;
+        const py = nodes[e.a].y + (nodes[e.b].y - nodes[e.a].y) * t;
+        const pulseOp = interpolate(t, [0, 0.1, 0.9, 1], [0, 0.55, 0.45, 0]);
+        return (
+          <circle key={`p${i}`} cx={px} cy={py} r={2.5}
+            fill={color} opacity={pulseOp} />
+        );
+      })}
+
+      {/* Nodos */}
+      {nodes.map((n, i) => {
+        const activating = (frame + i * 23) % 150 < 20;
+        const nodeOp = activating
+          ? interpolate((frame + i * 23) % 150, [0, 8, 20], [0.2, 0.65, 0.2])
+          : 0.2 + Math.sin(frame * 0.015 + i * 0.8) * 0.08;
+        const waveOp = activating
+          ? interpolate((frame + i * 23) % 150, [0, 10, 20], [0, 0.4, 0])
+          : 0;
+        const waveR = activating
+          ? interpolate((frame + i * 23) % 150, [0, 20], [6, 28])
+          : 0;
+        return (
+          <g key={i}>
+            {activating && (
+              <circle cx={n.x} cy={n.y} r={waveR} fill="none"
+                stroke={color} strokeWidth={0.8} opacity={waveOp} />
+            )}
+            <circle cx={n.x} cy={n.y} r={4} fill={color} opacity={nodeOp} />
+          </g>
+        );
+      })}
+    </svg>
+  );
+};
+
+// ─── TENSION: TargetingReticle con jitter y modo LOCK ────────────────────────
 const TargetingReticle: React.FC<OverlayProps> = ({ frame, fps, width, height, color }) => {
   const cx = width / 2;
   const cy = height * 0.4;
-  const rotation = (frame * 0.15) % 360;
+
+  const jitter = Math.sin(frame * 0.8) * 2 + Math.cos(frame * 1.3) * 1.5;
+  const rotation = (frame * 0.15 + jitter) % 360;
   const pulse = Math.sin(frame * 0.04) * 0.5 + 0.5;
   const ringR = 40 + pulse * 15;
+
+  // Modo LOCK cada 90 frames durante 12 frames
+  const lockCycle = frame % 90;
+  const isLocked = lockCycle < 12;
+  const lockOpacity = isLocked ? interpolate(lockCycle, [0, 3, 9, 12], [0, 0.8, 0.8, 0]) : 0;
+
+  // Segundo reticle orbitante
+  const orbitAngle = (frame * 0.4) * (Math.PI / 180);
+  const orbitR = 90;
+  const ox = cx + Math.cos(orbitAngle) * orbitR;
+  const oy = cy + Math.sin(orbitAngle) * orbitR * 0.5;
+
   return (
     <svg viewBox={`0 0 ${width} ${height}`} style={overlayStyle}>
+      {/* Reticle principal */}
       <g transform={`rotate(${rotation} ${cx} ${cy})`}>
         <line x1={cx - 70} y1={cy} x2={cx - 20} y2={cy} stroke={color} strokeWidth={1} opacity={0.35} />
         <line x1={cx + 20} y1={cy} x2={cx + 70} y2={cy} stroke={color} strokeWidth={1} opacity={0.35} />
@@ -106,26 +190,77 @@ const TargetingReticle: React.FC<OverlayProps> = ({ frame, fps, width, height, c
         <circle cx={cx} cy={cy} r={ringR} fill="none" stroke={color} strokeWidth={1} opacity={0.28} />
         <circle cx={cx} cy={cy} r={3} fill={color} opacity={0.45} />
       </g>
+
+      {/* Reticle secundario orbitante */}
+      <g transform={`rotate(${-rotation * 0.7} ${ox} ${oy})`}>
+        <circle cx={ox} cy={oy} r={16} fill="none" stroke={color} strokeWidth={0.8} opacity={0.2} />
+        <line x1={ox - 22} y1={oy} x2={ox - 8} y2={oy} stroke={color} strokeWidth={0.8} opacity={0.2} />
+        <line x1={ox + 8} y1={oy} x2={ox + 22} y2={oy} stroke={color} strokeWidth={0.8} opacity={0.2} />
+      </g>
+
+      {/* Indicador LOCKED */}
+      {isLocked && (
+        <text x={cx + 54} y={cy - 54} fill={color} fontSize={11}
+          fontFamily="'Courier New', monospace" letterSpacing={3}
+          opacity={lockOpacity} textAnchor="start">
+          LOCKED
+        </text>
+      )}
     </svg>
   );
 };
 
+// ─── DREAD: SlowGaze con párpado, iris y ojos secundarios ────────────────────
 const SlowGaze: React.FC<OverlayProps> = ({ frame, fps, width, height, color }) => {
-  const cx = width * 0.65;
-  const cy = height * 0.35;
-  const pupilR = 6 + Math.sin(frame * 0.02) * 3;
-  const outerR = 25 + Math.sin(frame * 0.015) * 5;
-  const gazeX = Math.sin(frame * 0.008) * 4;
-  const gazeY = Math.cos(frame * 0.012) * 3;
+  const eyes = useMemo(() => [
+    { cx: width * 0.65, cy: height * 0.35, scale: 1.0, opacity: 0.38 },
+    { cx: width * 0.18, cy: height * 0.22, scale: 0.45, opacity: 0.18 },
+    { cx: width * 0.82, cy: height * 0.72, scale: 0.35, opacity: 0.14 },
+  ], [width, height]);
+
   return (
     <svg viewBox={`0 0 ${width} ${height}`} style={overlayStyle}>
-      <ellipse cx={cx} cy={cy} rx={outerR} ry={outerR * 0.85} fill="none" stroke={color} strokeWidth={1.5} opacity={0.33} />
-      <ellipse cx={cx} cy={cy} rx={outerR * 0.7} ry={outerR * 0.6} fill="none" stroke={color} strokeWidth={1} opacity={0.28} />
-      <circle cx={cx + gazeX} cy={cy + gazeY} r={pupilR} fill={color} opacity={0.45} />
+      {eyes.map((eye, ei) => {
+        const outerR = (25 + Math.sin(frame * 0.015) * 5) * eye.scale;
+        const irisR = outerR * 0.65;
+        const pupilR = (6 + Math.sin(frame * 0.02) * 3) * eye.scale;
+        const gazeX = Math.sin(frame * 0.008 + ei) * 4 * eye.scale;
+        const gazeY = Math.cos(frame * 0.012 + ei) * 3 * eye.scale;
+
+        // Párpado: arco superior que se cierra lentamente cada 180 frames
+        const blinkCycle = (frame + ei * 60) % 180;
+        const lidClose = blinkCycle < 20
+          ? interpolate(blinkCycle, [0, 10, 20], [0, outerR * 0.9, 0])
+          : 0;
+
+        return (
+          <g key={ei} opacity={eye.opacity}>
+            {/* Esclerótica */}
+            <ellipse cx={eye.cx} cy={eye.cy} rx={outerR} ry={outerR * 0.85}
+              fill="none" stroke={color} strokeWidth={1.5} opacity={0.9} />
+            {/* Iris */}
+            <circle cx={eye.cx} cy={eye.cy} r={irisR}
+              fill="none" stroke={color} strokeWidth={1} opacity={0.7} />
+            {/* Pupila */}
+            <ellipse cx={eye.cx + gazeX} cy={eye.cy + gazeY}
+              rx={pupilR} ry={pupilR * (1.2 + Math.sin(frame * 0.03) * 0.3)}
+              fill={color} opacity={0.8} />
+            {/* Párpado superior */}
+            {lidClose > 0 && (
+              <path
+                d={`M ${eye.cx - outerR} ${eye.cy} A ${outerR} ${outerR * 0.85} 0 0 1 ${eye.cx + outerR} ${eye.cy}`}
+                fill={color} opacity={Math.min(lidClose / outerR, 0.9)}
+                transform={`translate(0, ${-outerR * 0.85 + lidClose})`}
+              />
+            )}
+          </g>
+        );
+      })}
     </svg>
   );
 };
 
+// ─── DRAMA: EMPPulse (original, funcionaba bien) ─────────────────────────────
 interface Particle { x: number; y: number; phase: number; speed: number; }
 
 const EMPPulse: React.FC<OverlayProps> = ({ frame, fps, width, height, color }) => {
@@ -144,55 +279,55 @@ const EMPPulse: React.FC<OverlayProps> = ({ frame, fps, width, height, color }) 
         const localFrame = frame * p.speed + p.phase;
         const r = interpolate(localFrame % 120, [0, 120], [0, maxR * 0.4]);
         const opacity = interpolate(localFrame % 120, [0, 30, 90, 120], [0, 0.35, 0.28, 0]);
-        return <circle key={i} cx={p.x} cy={p.y} r={r} fill="none" stroke={color} strokeWidth={1} opacity={opacity} />;
+        return <circle key={i} cx={p.x} cy={p.y} r={r} fill="none"
+          stroke={color} strokeWidth={1} opacity={opacity} />;
       })}
     </svg>
   );
 };
 
+// ─── DESPAIR: FallingAshes con polígonos irregulares y rotación ──────────────
 const FallingAshes: React.FC<OverlayProps> = ({ frame, width, height, color }) => {
-  const particles: { x: number; size: number; speed: number; drift: number }[] = useMemo(() =>
-    Array.from({ length: 12 }).map((_, i) => ({
-      x: ((i * 37 + 13) % 100) / 100,
-      size: 2 + ((i * 7) % 3),
-      speed: 0.3 + (i % 5) * 0.08,
+  const ashes = useMemo(() =>
+    Array.from({ length: 18 }).map((_, i) => ({
+      xBase: ((i * 37 + 13) % 100) / 100,
+      size: 2 + ((i * 7) % 4),
+      speed: 0.25 + (i % 5) * 0.07,
       drift: ((i * 11) % 60) / 100 - 0.3,
+      rotSpeed: ((i * 17) % 20 - 10) * 0.8,
+      phase: i * 37,
+      // Forma del polígono: 3-5 vértices con ángulos irregulares
+      angles: Array.from({ length: 3 + (i % 3) }, (_, v) => {
+        const base = (v / (3 + (i % 3))) * Math.PI * 2;
+        return base + ((i * v * 7) % 30 - 15) * (Math.PI / 180);
+      }),
+      radii: Array.from({ length: 3 + (i % 3) }, (_, v) =>
+        0.6 + ((i * v * 13 + 7) % 40) / 100
+      ),
     })), []);
 
   return (
     <svg viewBox={`0 0 ${width} ${height}`} style={overlayStyle}>
-      {particles.map((p, i) => {
-        const y = ((frame * p.speed + i * 50) % 120) / 120 * height;
-        const x = p.x * width + Math.sin(frame * 0.02 + i) * p.drift * 40;
-        const opacity = interpolate(y, [0, height * 0.1, height * 0.8, height], [0, 0.33, 0.28, 0]);
-        return <circle key={i} cx={x} cy={y} r={p.size} fill={color} opacity={opacity} />;
-      })}
-    </svg>
-  );
-};
+      {ashes.map((a, i) => {
+        const y = ((frame * a.speed + a.phase) % 130) / 130 * (height + 40) - 20;
+        const x = a.xBase * width + Math.sin(frame * 0.018 + i * 0.7) * a.drift * 50;
+        const rotation = (frame * a.rotSpeed + a.phase) % 360;
+        const opacity = interpolate(y,
+          [0, height * 0.08, height * 0.82, height],
+          [0, 0.32, 0.26, 0]);
 
-const FractureLightning: React.FC<OverlayProps> = ({ frame, fps, width, height, color }) => {
-  const boltCount = 3;
-  return (
-    <svg viewBox={`0 0 ${width} ${height}`} style={overlayStyle}>
-      {Array.from({ length: boltCount }).map((_, b) => {
-        const flashPhase = (frame * 0.5 + b * 40) % 100;
-        const visible = flashPhase < 15;
-        const opacity = visible ? interpolate(flashPhase, [0, 5, 15], [0, 0.4, 0]) : 0;
-        const startX = width * (0.2 + b * 0.3);
-        const startY = 0;
-        const endX = width * (0.15 + b * 0.35) + Math.sin(frame * 0.1 + b) * 30;
-        const endY = height;
-        const midX = startX + (endX - startX) * 0.4 + Math.sin(frame * 0.15 + b * 2) * 20;
-        const midY = height * 0.5 + Math.sin(frame * 0.12 + b * 3) * 15;
+        const pts = a.angles.map((angle, v) => {
+          const r = a.size * a.radii[v];
+          return `${Math.cos(angle) * r},${Math.sin(angle) * r}`;
+        }).join(" ");
+
         return (
-          <path
-            key={b}
-            d={`M${startX},${startY} Q${midX},${midY} ${endX},${endY}`}
-            fill="none"
-            stroke={color}
-            strokeWidth={1.5}
+          <polygon
+            key={i}
+            points={pts}
+            fill={color}
             opacity={opacity}
+            transform={`translate(${x}, ${y}) rotate(${rotation})`}
           />
         );
       })}
@@ -200,6 +335,66 @@ const FractureLightning: React.FC<OverlayProps> = ({ frame, fps, width, height, 
   );
 };
 
+// ─── RAGE: FractureLightning con zigzag real y ramificaciones ────────────────
+function boltPoints(
+  startX: number, startY: number,
+  endX: number, endY: number,
+  seed: number
+): string {
+  const steps = 9;
+  const pts: [number, number][] = [[startX, startY]];
+  for (let s = 1; s < steps; s++) {
+    const t = s / steps;
+    const bx = startX + (endX - startX) * t;
+    const by = startY + (endY - startY) * t;
+    const jitter = Math.sin(s * 3.7 + seed * 7.3) * 22 * (1 - t * 0.5);
+    pts.push([bx + jitter, by]);
+  }
+  pts.push([endX, endY]);
+  return pts.map(p => p.join(",")).join(" ");
+}
+
+const FractureLightning: React.FC<OverlayProps> = ({ frame, fps, width, height, color }) => {
+  const boltCount = 3;
+  return (
+    <svg viewBox={`0 0 ${width} ${height}`} style={overlayStyle}>
+      {Array.from({ length: boltCount }).map((_, b) => {
+        // Flasheo irregular: no constante, sino basado en número primo
+        const flashCycle = (frame * 0.5 + b * 43) % 100;
+        const visible = flashCycle < 14;
+        const opacity = visible ? interpolate(flashCycle, [0, 4, 14], [0, 0.45, 0]) : 0;
+
+        const startX = width * (0.18 + b * 0.32);
+        const endX = width * (0.12 + b * 0.38) + Math.sin(frame * 0.07 + b) * 25;
+        const seed = b * 31 + Math.floor(frame / 8) * 7; // cambia cada 8 frames
+
+        // Rayo principal
+        const mainPts = boltPoints(startX, 0, endX, height, seed);
+
+        // Ramificación desde punto medio
+        const midX = startX + (endX - startX) * 0.45 + Math.sin(seed * 1.7) * 18;
+        const midY = height * 0.48;
+        const branchEndX = midX + Math.sin(seed * 2.3) * 60;
+        const branchPts = boltPoints(midX, midY, branchEndX, height * 0.75, seed + 5);
+
+        return (
+          <g key={b}>
+            <polyline points={mainPts} fill="none"
+              stroke={color} strokeWidth={1.8} opacity={opacity} />
+            <polyline points={branchPts} fill="none"
+              stroke={color} strokeWidth={0.9} opacity={opacity * 0.55} />
+            {/* Resplandor del rayo */}
+            <polyline points={mainPts} fill="none"
+              stroke={color} strokeWidth={4} opacity={opacity * 0.12}
+              strokeLinecap="round" />
+          </g>
+        );
+      })}
+    </svg>
+  );
+};
+
+// ─── TERROR: GlitchReticle (original, funciona bien) ─────────────────────────
 const GlitchReticle: React.FC<OverlayProps> = ({ frame, fps, width, height, color }) => {
   const cx = width / 2;
   const cy = height / 2;
@@ -214,15 +409,9 @@ const GlitchReticle: React.FC<OverlayProps> = ({ frame, fps, width, height, colo
         const bandY = height * (0.2 + i * 0.2) + Math.sin(frame * 0.2 + i * 3) * 10;
         const bandH = 3 + Math.sin(frame * 0.4 + i * 2) * 2;
         return (
-          <rect
-            key={i}
-            x={0}
-            y={bandY}
-            width={width}
-            height={bandH}
+          <rect key={i} x={0} y={bandY} width={width} height={bandH}
             fill={i % 2 === 0 ? color : "none"}
-            opacity={glitchIntensity * 0.28}
-          />
+            opacity={glitchIntensity * 0.28} />
         );
       })}
       <g transform={`rotate(${rotation} ${cx} ${cy})`}>
@@ -234,21 +423,71 @@ const GlitchReticle: React.FC<OverlayProps> = ({ frame, fps, width, height, colo
   );
 };
 
+// ─── TRIUMPH: AscendingPulse con 3 pulsos escalonados y explosión ─────────────
 const AscendingPulse: React.FC<OverlayProps> = ({ frame, fps, width, height, color }) => {
-  const cx = width / 2;
-  const progress = (frame % 90) / 90;
-  const y = interpolate(progress, [0, 1], [height * 0.8, height * 0.1]);
-  const r = interpolate(progress, [0, 0.3, 1], [5, 20, 5]);
-  const opacity = interpolate(progress, [0, 0.1, 0.9, 1], [0, 0.35, 0.28, 0]);
+  const pulses = [
+    { cx: width / 2,       phaseOffset: 0,  intensity: 1.0 },
+    { cx: width / 2 - 120, phaseOffset: 20, intensity: 0.65 },
+    { cx: width / 2 + 120, phaseOffset: 40, intensity: 0.65 },
+  ];
+
   return (
     <svg viewBox={`0 0 ${width} ${height}`} style={overlayStyle}>
-      <circle cx={cx} cy={y} r={r} fill="none" stroke={color} strokeWidth={1.5} opacity={opacity} />
-      <circle cx={cx} cy={y} r={r * 0.5} fill={color} opacity={opacity * 0.6} />
-      <line x1={cx - r * 2} y1={y} x2={cx + r * 2} y2={y} stroke={color} strokeWidth={1} opacity={opacity * 0.5} />
+      {pulses.map((p, pi) => {
+        const progress = ((frame + p.phaseOffset) % 90) / 90;
+        const y = interpolate(progress, [0, 1], [height * 0.82, height * 0.1]);
+        const r = interpolate(progress, [0, 0.25, 0.8, 1], [4, 18, 12, 4]);
+        const opacity = interpolate(progress, [0, 0.08, 0.9, 1], [0, 0.38, 0.3, 0]) * p.intensity;
+
+        // Explosión al llegar al tope (progress > 0.88)
+        const exploding = progress > 0.88;
+        const explodeT = exploding ? (progress - 0.88) / 0.12 : 0;
+
+        return (
+          <g key={pi}>
+            <circle cx={p.cx} cy={y} r={r} fill="none"
+              stroke={color} strokeWidth={1.5} opacity={opacity} />
+            <circle cx={p.cx} cy={y} r={r * 0.5}
+              fill={color} opacity={opacity * 0.6} />
+            <line x1={p.cx - r * 2} y1={y} x2={p.cx + r * 2} y2={y}
+              stroke={color} strokeWidth={1} opacity={opacity * 0.5} />
+
+            {/* Líneas de explosión radiales */}
+            {exploding && Array.from({ length: 4 }, (_, k) => {
+              const angle = (k / 4) * Math.PI * 2 + pi * 0.5;
+              const len = explodeT * 35;
+              return (
+                <line key={k}
+                  x1={p.cx + Math.cos(angle) * r}
+                  y1={y + Math.sin(angle) * r}
+                  x2={p.cx + Math.cos(angle) * (r + len)}
+                  y2={y + Math.sin(angle) * (r + len)}
+                  stroke={color} strokeWidth={1}
+                  opacity={(1 - explodeT) * 0.45 * p.intensity} />
+              );
+            })}
+          </g>
+        );
+      })}
+
+      {/* Línea horizontal de barrido cuando el pulso central llega al tope */}
+      {(() => {
+        const progress = (frame % 90) / 90;
+        if (progress < 0.85 || progress > 0.98) return null;
+        const sweepT = (progress - 0.85) / 0.13;
+        const sweepX = sweepT * width;
+        const sweepY = height * 0.1;
+        return (
+          <line x1={0} y1={sweepY} x2={sweepX} y2={sweepY}
+            stroke={color} strokeWidth={1}
+            opacity={interpolate(sweepT, [0, 0.5, 1], [0, 0.35, 0])} />
+        );
+      })()}
     </svg>
   );
 };
 
+// ─── RESOLUTION: WaveformDecay (original, funciona bien) ─────────────────────
 const WaveformDecay: React.FC<OverlayProps> = ({ frame, fps, width, height, color }) => {
   const amplitude = interpolate(frame, [0, fps * 5], [15, 2]);
   const points = Array.from({ length: 80 }).map((_, i) => {
@@ -264,6 +503,7 @@ const WaveformDecay: React.FC<OverlayProps> = ({ frame, fps, width, height, colo
   );
 };
 
+// ─── GLOBALES (sin cambios) ───────────────────────────────────────────────────
 const WeldingSpark: React.FC<OverlayProps> = ({ frame, width, height, color }) => {
   const sparks = useMemo(() =>
     Array.from({ length: 8 }).map((_, i) => ({
@@ -287,7 +527,8 @@ const WeldingSpark: React.FC<OverlayProps> = ({ frame, width, height, color }) =
         const sparkOpacity = interpolate(progress, [0, 0.1, 0.6, 1], [0.4, 0.5, 0.3, 0]);
         return (
           <g key={i}>
-            <line x1={trailEndX} y1={trailEndY} x2={x} y2={y} stroke={color} strokeWidth={0.5} opacity={sparkOpacity * 0.5} />
+            <line x1={trailEndX} y1={trailEndY} x2={x} y2={y}
+              stroke={color} strokeWidth={0.5} opacity={sparkOpacity * 0.5} />
             <circle cx={x} cy={y} r={1.5} fill={color} opacity={sparkOpacity} />
           </g>
         );
@@ -317,15 +558,9 @@ const TriGrid: React.FC<OverlayProps> = ({ frame, width, height, color }) => {
         const points = `0,${-h} ${-t.size / 2},${h / 2} ${t.size / 2},${h / 2}`;
         const opacity = 0.15 + Math.sin(frame * 0.02 + i * 1.5) * 0.1;
         return (
-          <polygon
-            key={i}
-            points={points}
-            fill="none"
-            stroke={color}
-            strokeWidth={0.8}
-            opacity={opacity}
-            transform={`translate(${t.x + offsetX}, ${t.y + offsetY}) rotate(${rot})`}
-          />
+          <polygon key={i} points={points} fill="none"
+            stroke={color} strokeWidth={0.8} opacity={opacity}
+            transform={`translate(${t.x + offsetX}, ${t.y + offsetY}) rotate(${rot})`} />
         );
       })}
     </svg>
@@ -349,7 +584,8 @@ const MicroPulse: React.FC<OverlayProps> = ({ frame, width, height, color }) => 
         const r = interpolate(progress, [0, 1], [1, p.maxR]);
         const opacity = interpolate(progress, [0, 0.3, 1], [0.35, 0.3, 0]);
         return (
-          <circle key={i} cx={p.cx} cy={p.cy} r={r} fill="none" stroke={color} strokeWidth={0.5} opacity={opacity} />
+          <circle key={i} cx={p.cx} cy={p.cy} r={r} fill="none"
+            stroke={color} strokeWidth={0.5} opacity={opacity} />
         );
       })}
     </svg>
