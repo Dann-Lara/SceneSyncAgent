@@ -1,8 +1,5 @@
 import { Composition, registerRoot } from "remotion";
 import { Main } from "./Main";
-import { loadFont } from "@remotion/google-fonts/Limelight";
-
-loadFont();
 
 const RemotionRoot: React.FC = () => {
   return (

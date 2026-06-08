@@ -287,7 +287,6 @@ export const Intro: React.FC<IntroProps> = ({ duration, channelStyle }) => {
             fontWeight: 900,
             letterSpacing: 10,
             textTransform: "uppercase",
-            fontFamily: "'Limelight', serif",
             textShadow: `0 0 30px ${channelStyle.primaryColor}aa, 0 2px 4px rgba(0,0,0,0.8)`,
           }}
         >

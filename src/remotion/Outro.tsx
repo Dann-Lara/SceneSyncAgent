@@ -250,7 +250,6 @@ export const Outro: React.FC<OutroProps> = ({ duration, channelStyle }) => {
               fontSize: 13,
               letterSpacing: 6,
               textTransform: "uppercase",
-              fontFamily: "'Limelight', serif",
               fontWeight: 500,
               marginBottom: 10,
               textShadow: `0 0 20px ${channelStyle.primaryColor}88`,
@@ -273,7 +272,6 @@ export const Outro: React.FC<OutroProps> = ({ duration, channelStyle }) => {
                 fontSize: 48,
                 fontWeight: 700,
                 letterSpacing: -0.5,
-                fontFamily: "'Limelight', serif",
                 textShadow: `0 2px 30px rgba(0,0,0,0.7), 0 0 50px ${channelStyle.primaryColor}22`,
                 lineHeight: 1.2,
               }}
@@ -310,7 +308,6 @@ export const Outro: React.FC<OutroProps> = ({ duration, channelStyle }) => {
               letterSpacing: 7,
               textTransform: "uppercase",
               fontWeight: 500,
-              fontFamily: "'Limelight', serif",
               textShadow: `0 0 30px ${channelStyle.primaryColor}aa, 0 2px 4px rgba(0,0,0,0.8)`,
             }}
           >

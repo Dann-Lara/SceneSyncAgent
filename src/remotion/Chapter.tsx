@@ -245,7 +245,6 @@ const ChapterTitleCard: React.FC<{
             textTransform: "uppercase",
             fontWeight: 700,
             marginBottom: 10,
-            fontFamily: "'Limelight', serif",
             textShadow: `0 0 20px ${style.primaryColor}66`,
           }}
         >
@@ -258,7 +257,6 @@ const ChapterTitleCard: React.FC<{
             fontWeight: 500,
             lineHeight: 1.35,
             textShadow: `0 2px 15px rgba(0,0,0,0.5), 0 0 ${20 * glowPulse}px ${style.primaryColor}66`,
-            fontFamily: "'Limelight', serif",
           }}
         >
           {scene.title}
