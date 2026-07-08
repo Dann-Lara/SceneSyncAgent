@@ -43,13 +43,7 @@ function RedactedLines({ color, opacity }: { color: string; opacity: number }) {
 }
 
 // Secuencia de acceso tipo terminal
-function AccessSequence({ progress, color }: { progress: number; color: string }) {
-  const lines = [
-    "INICIANDO PROTOCOLO DE ACCESO...",
-    "NIVEL: MÁXIMO CLASIFICADO",
-    "VERIFICANDO... ████████████ 100%",
-    "ACCESO CONCEDIDO",
-  ];
+function AccessSequence({ progress, color, lines }: { progress: number; color: string; lines: string[] }) {
   const visibleLines = Math.floor(progress * (lines.length + 1));
 
   return (
@@ -72,7 +66,7 @@ function AccessSequence({ progress, color }: { progress: number; color: string }
           key={i}
           style={{
             color: i === lines.length - 1 ? "#ffffff" : `${color}cc`,
-            fontSize: i === lines.length - 1 ? 16 : 13,
+            fontSize: i === lines.length - 1 ? 34 : 27,
             fontFamily: "'Courier New', monospace",
             letterSpacing: i === lines.length - 1 ? 6 : 3,
             fontWeight: i === lines.length - 1 ? 700 : 400,
@@ -263,7 +257,16 @@ export const Intro: React.FC<IntroProps> = ({ duration, channelStyle }) => {
 
       {/* Secuencia de acceso terminal */}
       {showAccessSeq && (
-        <AccessSequence progress={accessProgress} color={channelStyle.primaryColor} />
+        <AccessSequence
+          progress={accessProgress}
+          color={channelStyle.primaryColor}
+          lines={channelStyle.introAccessLines ?? [
+            "INICIANDO PROTOCOLO DE ACCESO...",
+            "NIVEL: MÁXIMO CLASIFICADO",
+            "VERIFICANDO... ████████████ 100%",
+            "ACCESO CONCEDIDO",
+          ]}
+        />
       )}
 
       {/* Sello CLASIFICADO */}
@@ -275,7 +278,8 @@ export const Intro: React.FC<IntroProps> = ({ duration, channelStyle }) => {
           transform: `translate(-50%, -50%) rotate(-12deg) scale(${stampScale})`,
           opacity: stampOpacity,
           border: `5px solid ${channelStyle.primaryColor}`,
-          padding: "10px 28px",
+          padding: "14px 38px",
+          whiteSpace: "nowrap",
           zIndex: 10,
           pointerEvents: "none",
         }}
@@ -283,14 +287,14 @@ export const Intro: React.FC<IntroProps> = ({ duration, channelStyle }) => {
         <div
           style={{
             color: "#ffffff",
-            fontSize: 42,
+            fontSize: 72,
             fontWeight: 900,
             letterSpacing: 10,
             textTransform: "uppercase",
             textShadow: `0 0 30px ${channelStyle.primaryColor}aa, 0 2px 4px rgba(0,0,0,0.8)`,
           }}
         >
-          CLASIFICADO
+          {channelStyle.introStamp ?? "CLASIFICADO"}
         </div>
       </div>
 
@@ -359,7 +363,7 @@ export const Intro: React.FC<IntroProps> = ({ duration, channelStyle }) => {
           <div
             style={{
               color: "#ffffff",
-              fontSize: 72,
+              fontSize: 122,
               fontWeight: 900,
               lineHeight: 1.15,
               letterSpacing: -1,
@@ -398,7 +402,7 @@ export const Intro: React.FC<IntroProps> = ({ duration, channelStyle }) => {
       <div
         style={{
           position: "absolute",
-          top: "calc(50% + 72px)",
+          top: "calc(50% + 100px)",
           left: "50%",
           transform: `translate(-50%, ${channelY}px)`,
           opacity: Math.min(channelReveal, channelFade),
@@ -409,7 +413,7 @@ export const Intro: React.FC<IntroProps> = ({ duration, channelStyle }) => {
         <div
           style={{
             color: "#ffffff",
-            fontSize: 18,
+            fontSize: 40,
             letterSpacing: 8,
             textTransform: "uppercase",
             fontWeight: 500,

@@ -1,6 +1,18 @@
-export type TransitionType = "fade" | "radial" | "glitch" | "flash" | "zoom-blur" | "shatter" | "crossfade" | "slide-left" | "slide-right" | "slide-up" | "slide-down" | "whip" | "3d-flip" | "zoom-in" | "zoom-out" | "pixelate";
+export interface SubtitleLine {
+  startFrame: number;
+  endFrame: number;
+  text: string;
+}
+
+export type TransitionType = "fade" | "radial" | "glitch" | "flash" | "zoom-blur" | "shatter" | "crossfade" | "slide-left" | "slide-right" | "slide-up" | "slide-down" | "whip" | "zoom-in" | "zoom-out" | "pixelate";
 
 export type Sentiment = "calm" | "tension" | "drama" | "terror" | "resolution" | "mystery" | "rage" | "despair" | "triumph" | "dread";
+export type Climate = "clear" | "rain" | "storm";
+
+export interface ContentPalette {
+  primaryColor: string;
+  secondaryColor: string;
+}
 
 export interface ChannelStyle {
   channelName: string;
@@ -12,6 +24,18 @@ export interface ChannelStyle {
   transitionType: TransitionType;
   transitionDuration: number;
   mood: string;
+  videoType?: "narrativo" | "lista";
+  trackSchedule?: Record<string, string>;
+  musicVideoMaxChapter?: number;
+  introAccessLines?: string[];
+  introStamp?: string;
+  outroStatusFormat?: string;
+  outroEndLabel?: string;
+  outroContinuation?: string;
+  outroSubtitle?: string;
+  outroNextLabel?: string;
+  outroNextSubtext?: string;
+  contentPalettes?: Record<string, ContentPalette>;
 }
 
 export interface SceneImage {
@@ -27,6 +51,13 @@ export interface ImageMeta extends SceneImage {
   sentiment: Sentiment;
   kenBurnsStart: number;
   kenBurnsEnd: number;
+  protagonist?: string;
+}
+
+export interface SilenceRegion {
+  startFrame: number;
+  endFrame: number;
+  durationInFrames: number;
 }
 
 export interface Scene {
@@ -37,12 +68,18 @@ export interface Scene {
   durationInFrames: number;
   images: ImageMeta[];
   subtitles?: { start: number; end: number; text: string }[];
+  climate?: Climate;
+  silences?: SilenceRegion[];
 }
 
 export interface MusicTrack {
   path: string;
-  chapterStart: number;
-  chapterEnd: number;
+  startFrame: number;
+  durationInFrames: number;
+  actualFrames: number;
+  trackNumber?: number;
+  chapterStart?: number;
+  chapterEnd?: number;
 }
 
 export interface VideoInput {
@@ -54,6 +91,8 @@ export interface VideoInput {
   outroVideo?: string;
   backgroundMusic?: string;
   musicTracks?: MusicTrack[];
+  subtitles?: SubtitleLine[];
+  authorName?: string;
 }
 
 export interface ContentValidatorResult {
@@ -73,11 +112,14 @@ export interface DirectionImage {
   sentiment: Sentiment;
   contextNote: string;
   durationInFrames?: number;
+  protagonist?: string;
 }
 
 export interface DirectionChapter {
   chapterIndex: number;
   images: DirectionImage[];
+  climate?: Climate;
+  silences?: SilenceRegion[];
 }
 
 export interface VideoDirections {

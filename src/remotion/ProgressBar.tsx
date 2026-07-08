@@ -7,6 +7,8 @@ interface ProgressBarProps {
   color?: string;
   chapterIndex?: number;
   totalChapters?: number;
+  displayIndex?: number;
+  displayTotal?: number;
   show?: "always" | "during-chapter";
 }
 
@@ -17,6 +19,8 @@ export const ProgressBar: React.FC<ProgressBarProps> = ({
   color = "#1a3a5c",
   chapterIndex,
   totalChapters,
+  displayIndex,
+  displayTotal,
   show = "during-chapter",
 }) => {
   const progress = totalFrames > 0 ? frame / totalFrames : 0;
@@ -28,7 +32,7 @@ export const ProgressBar: React.FC<ProgressBarProps> = ({
         extrapolateRight: "clamp",
       });
 
-  const totalWidth = 300;
+  const totalWidth = 400;
   const filledWidth = interpolate(progress, [0, 1], [0, totalWidth], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
@@ -38,12 +42,12 @@ export const ProgressBar: React.FC<ProgressBarProps> = ({
     <div
       style={{
         position: "absolute",
-        bottom: 80,
+        bottom: 100,
         left: "50%",
         transform: "translateX(-50%)",
         display: "flex",
         alignItems: "center",
-        gap: 14,
+        gap: 42,
         opacity,
         zIndex: 40,
         pointerEvents: "none",
@@ -54,24 +58,24 @@ export const ProgressBar: React.FC<ProgressBarProps> = ({
         <div
           style={{
             color: `${color}cc`,
-            fontSize: 12,
-            letterSpacing: 2,
+            fontSize: 36,
+            letterSpacing: 6,
             fontFamily: "'Courier New', monospace",
             fontWeight: 400,
-            minWidth: 60,
+            minWidth: 180,
             textAlign: "right",
           }}
         >
-          {String(chapterIndex + 1).padStart(2, "0")}/{String(totalChapters).padStart(2, "0")}
+          {displayIndex !== undefined ? String(displayIndex).padStart(2, "0") : String(chapterIndex + 1).padStart(2, "0")}/{displayTotal !== undefined ? String(displayTotal).padStart(2, "0") : String(totalChapters).padStart(2, "0")}
         </div>
       )}
 
       <div
         style={{
           width: totalWidth,
-          height: 2,
+          height: 6,
           backgroundColor: "rgba(255,255,255,0.15)",
-          borderRadius: 1,
+          borderRadius: 3,
           position: "relative",
           overflow: "hidden",
         }}
@@ -81,8 +85,8 @@ export const ProgressBar: React.FC<ProgressBarProps> = ({
             height: "100%",
             width: filledWidth,
             backgroundColor: color,
-            borderRadius: 1,
-            boxShadow: `0 0 6px ${color}66`,
+            borderRadius: 3,
+            boxShadow: `0 0 18px ${color}66`,
             transition: "none",
           }}
         />

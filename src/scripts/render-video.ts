@@ -21,6 +21,13 @@ async function renderVideo(videoDir: string, outputPath: string): Promise<void> 
 
   const sceneData = await buildScenes(videoDir, style, chapterTitles);
 
+  // Test: solo un capítulo
+  const testCap = process.argv.includes("--cap") ? parseInt(process.argv[process.argv.indexOf("--cap") + 1]) : 0;
+  if (testCap > 0) {
+    const idx = testCap - 1;
+    sceneData.scenes = [sceneData.scenes[idx]];
+  }
+
   const inputProps: VideoInput = {
     channelStyle: style,
     scenes: sceneData.scenes,
@@ -125,12 +132,12 @@ function slugify(text: string): string {
 }
 
 if (process.argv[1]?.endsWith("render-video.ts")) {
-  const args = process.argv.slice(2);
+  const args = process.argv.slice(2).filter((a) => a !== "--cap" && !/^\d+$/.test(a) && a !== process.argv[process.argv.indexOf("--cap") + 1]);
   const videoDir = args[0];
 
   if (!videoDir) {
-    console.error("❌ Uso: npx tsx src/scripts/render-video.ts <directorio-del-video> [output.mp4]");
-    console.error("   Ej: npx tsx src/scripts/render-video.ts content/academia-de-villanos/2026-05-29_mi-video");
+    console.error("❌ Uso: npx tsx src/scripts/render-video.ts <directorio-del-video> [output.mp4] [--cap N]");
+    console.error("   Ej: npx tsx src/scripts/render-video.ts content/academia-de-villanos/2026-05-29_mi-video --cap 1");
     process.exit(1);
   }
 

@@ -73,6 +73,9 @@ export const Outro: React.FC<OutroProps> = ({ duration, channelStyle }) => {
     extrapolateRight: "clamp",
   });
 
+  const statusText = (channelStyle.outroStatusFormat ?? "CASO: {title} — ACTIVO")
+    .replace(/\{title\}/g, channelStyle.videoTitle?.toUpperCase().slice(0, 18) ?? "ARCHIVO");
+
   // Fade-out final propio (últimos 20 frames)
   const finalFade = interpolate(progress, [0.88, 1], [1, 0], {
     extrapolateLeft: "clamp",
@@ -215,14 +218,14 @@ export const Outro: React.FC<OutroProps> = ({ duration, channelStyle }) => {
         <div
           style={{
             color: channelStyle.primaryColor,
-            fontSize: 11,
+            fontSize: 23,
             letterSpacing: 4,
             fontFamily: "'Courier New', monospace",
             fontWeight: 500,
             opacity: 0.85,
           }}
         >
-          CASO: {channelStyle.videoTitle?.toUpperCase().slice(0, 18) ?? "ARCHIVO"} — ACTIVO
+          {statusText}
         </div>
       </div>
 
@@ -247,7 +250,7 @@ export const Outro: React.FC<OutroProps> = ({ duration, channelStyle }) => {
           <div
             style={{
               color: "#ffffff",
-              fontSize: 13,
+              fontSize: 30,
               letterSpacing: 6,
               textTransform: "uppercase",
               fontWeight: 500,
@@ -255,13 +258,13 @@ export const Outro: React.FC<OutroProps> = ({ duration, channelStyle }) => {
               textShadow: `0 0 20px ${channelStyle.primaryColor}88`,
             }}
           >
-            FIN DEL ARCHIVO
+            {channelStyle.outroEndLabel ?? "FIN DEL ARCHIVO"}
           </div>
           <div
             style={{
               background: "rgba(0,0,0,0.5)",
               backdropFilter: "blur(10px)",
-              padding: "16px 36px",
+              padding: "28px 60px",
               borderRadius: 8,
               border: `1px solid ${channelStyle.primaryColor}22`,
             }}
@@ -269,14 +272,15 @@ export const Outro: React.FC<OutroProps> = ({ duration, channelStyle }) => {
             <div
               style={{
                 color: "#ffffff",
-                fontSize: 48,
+                fontSize: 81,
                 fontWeight: 700,
                 letterSpacing: -0.5,
+                whiteSpace: "nowrap",
                 textShadow: `0 2px 30px rgba(0,0,0,0.7), 0 0 50px ${channelStyle.primaryColor}22`,
                 lineHeight: 1.2,
               }}
             >
-              El expediente continúa.
+              {channelStyle.outroContinuation ?? "El expediente continúa."}
             </div>
           </div>
         </div>
@@ -304,7 +308,7 @@ export const Outro: React.FC<OutroProps> = ({ duration, channelStyle }) => {
           <div
             style={{
               color: "#ffffff",
-              fontSize: 16,
+              fontSize: 40,
               letterSpacing: 7,
               textTransform: "uppercase",
               fontWeight: 500,
@@ -316,13 +320,13 @@ export const Outro: React.FC<OutroProps> = ({ duration, channelStyle }) => {
           <div
             style={{
               color: `${channelStyle.primaryColor}99`,
-              fontSize: 11,
+              fontSize: 27,
               letterSpacing: 3,
               fontFamily: "'Courier New', monospace",
               textTransform: "uppercase",
             }}
           >
-            ACADEMIA DE ANÁLISIS CLASIFICADO
+            {channelStyle.outroSubtitle ?? "ACADEMIA DE ANÁLISIS CLASIFICADO"}
           </div>
         </div>
       </div>
@@ -348,7 +352,7 @@ export const Outro: React.FC<OutroProps> = ({ duration, channelStyle }) => {
         >
           <div
             style={{
-              padding: "16px 44px",
+              padding: "28px 74px",
               border: `2px solid ${channelStyle.primaryColor}`,
               borderRadius: 6,
               backgroundColor: `${channelStyle.primaryColor}22`,
@@ -360,18 +364,18 @@ export const Outro: React.FC<OutroProps> = ({ duration, channelStyle }) => {
             <div
               style={{
                 color: "#ffffff",
-                fontSize: 20,
+                fontSize: 47,
                 fontWeight: 700,
                 letterSpacing: 3,
                 textTransform: "uppercase",
               }}
             >
-              SUSCRIBIRSE
+              Suscríbete
             </div>
             <div
               style={{
                 color: `${channelStyle.primaryColor}cc`,
-                fontSize: 11,
+                fontSize: 18,
                 letterSpacing: 2,
                 textTransform: "uppercase",
                 textAlign: "center",
@@ -384,13 +388,13 @@ export const Outro: React.FC<OutroProps> = ({ duration, channelStyle }) => {
           </div>
           <div
             style={{
-              color: `rgba(255,255,255,0.4)`,
-              fontSize: 12,
-              letterSpacing: 2,
-              textTransform: "uppercase",
-            }}
-          >
-            Activar la campana
+            color: `rgba(255,255,255,0.4)`,
+            fontSize: 27,
+            letterSpacing: 2,
+            textTransform: "uppercase",
+          }}
+        >
+          Activar la campana
           </div>
         </div>
 
@@ -413,8 +417,8 @@ export const Outro: React.FC<OutroProps> = ({ duration, channelStyle }) => {
         >
           <div
             style={{
-              width: 220,
-              height: 72,
+              width: 320,
+              height: 100,
               border: `1px solid ${channelStyle.primaryColor}44`,
               borderRadius: 6,
               backgroundColor: "rgba(0,0,0,0.4)",
@@ -440,13 +444,13 @@ export const Outro: React.FC<OutroProps> = ({ duration, channelStyle }) => {
             <div
               style={{
                 color: `rgba(255,255,255,0.3)`,
-                fontSize: 10,
+                fontSize: 23,
                 letterSpacing: 2,
                 fontFamily: "'Courier New', monospace",
                 textTransform: "uppercase",
               }}
             >
-              EN PRODUCCIÓN
+              {channelStyle.outroNextSubtext ?? "EN PRODUCCIÓN"}
             </div>
             <div
               style={{
@@ -459,12 +463,12 @@ export const Outro: React.FC<OutroProps> = ({ duration, channelStyle }) => {
           <div
             style={{
               color: `rgba(255,255,255,0.4)`,
-              fontSize: 12,
+              fontSize: 21,
               letterSpacing: 2,
               textTransform: "uppercase",
             }}
           >
-            Próximo análisis
+            {channelStyle.outroNextLabel ?? "Próximo análisis"}
           </div>
         </div>
       </div>
@@ -499,7 +503,7 @@ export const Outro: React.FC<OutroProps> = ({ duration, channelStyle }) => {
         <div
           style={{
             color: "#ffffff",
-            fontSize: 13,
+            fontSize: 27,
             letterSpacing: 3,
             fontFamily: "'Special Elite', 'Courier New', monospace",
             fontWeight: 500,

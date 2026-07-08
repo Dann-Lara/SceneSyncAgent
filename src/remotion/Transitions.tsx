@@ -56,12 +56,6 @@ export function applyTransition(
         extrapolateRight: "clamp",
         easing: Easing.bezier(0.33, 0, 0.67, 0.33),
       });
-    case "3d-flip":
-      return interpolate(progress, [0, 0.4, 1], [0, 0.5, 1], {
-        extrapolateLeft: "clamp",
-        extrapolateRight: "clamp",
-        easing: Easing.bezier(0.45, 0, 0.55, 1),
-      });
     case "zoom-in":
       return interpolate(progress, [0, 0.3, 1], [0, 0.4, 1], {
         extrapolateLeft: "clamp",
@@ -174,13 +168,6 @@ export function getTransitionTransform(
         return `translateX(${wpx}px)`;
       }
       return "none";
-    case "3d-flip":
-      const angle = interpolate(progress, [0, 0.5, 1], [-90, -90, 0], {
-        extrapolateLeft: "clamp",
-        extrapolateRight: "clamp",
-        easing: Easing.bezier(0.45, 0, 0.55, 1),
-      });
-      return `perspective(800px) rotateY(${angle}deg)`;
     case "zoom-in":
       const zi = interpolate(progress, [0, 1], [0.3, 1], {
         extrapolateLeft: "clamp",
@@ -261,18 +248,6 @@ export function getTransitionOverlay(
         inset: 0,
         opacity: whipOpacity,
         background: `linear-gradient(to right, transparent 0%, rgba(255,255,255,0.08) 50%, transparent 100%)`,
-        pointerEvents: "none" as const,
-      };
-    case "3d-flip":
-      const flipShine = interpolate(progress, [0, 0.3, 0.7, 1], [0, 0.12, 0.06, 0], {
-        extrapolateLeft: "clamp",
-        extrapolateRight: "clamp",
-      });
-      return {
-        position: "absolute" as const,
-        inset: 0,
-        opacity: flipShine,
-        background: `linear-gradient(to right, transparent 0%, ${primaryColor}33 50%, transparent 100%)`,
         pointerEvents: "none" as const,
       };
     case "pixelate":

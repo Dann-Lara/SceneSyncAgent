@@ -3,7 +3,7 @@ import * as os from "node:os";
 import * as path from "node:path";
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
-import type { Scene, ImageMeta, ChannelStyle, MusicTrack, TransitionType, Sentiment, DirectionImage } from "../types";
+import type { Scene, ImageMeta, ChannelStyle, MusicTrack, TransitionType, Sentiment, DirectionImage, Climate } from "../types";
 import { detectChapters } from "./validate-content";
 
 const VALID_IMAGE_EXTS = [".jpg", ".jpeg", ".png", ".webp"];
@@ -216,11 +216,16 @@ function matchScore(a: string, b: string): number {
   return -1;
 }
 
-export function alignWordsWithDP(
+export interface WordAlignment {
+  wordCounts: number[];
+  imageStart: (number | null)[];
+  imageEnd: (number | null)[];
+}
+
+export function assignWordsToImages(
   texts: string[],
-  whisperWords: WhisperWord[],
-  fps: number
-): number[] {
+  whisperWords: WhisperWord[]
+): WordAlignment {
   type WordInfo = { word: string; imageIdx: number };
   const allExpected: WordInfo[] = [];
 
@@ -231,16 +236,21 @@ export function alignWordsWithDP(
     }
   }
 
-  if (allExpected.length === 0) return texts.map(() => 0);
-
   const wWords = whisperWords.map((w) =>
     w.word.toLowerCase().replace(/[^a-záéíóúüñ0-9]/g, "")
   );
 
-  if (wWords.length === 0) return texts.map(() => 0);
-
   const N = allExpected.length;
   const M = wWords.length;
+
+  const empty = {
+    wordCounts: texts.map(() => 0),
+    imageStart: texts.map(() => null) as (number | null)[],
+    imageEnd: texts.map(() => null) as (number | null)[],
+  };
+
+  if (N === 0 || M === 0) return empty;
+
   const dp: number[][] = Array.from({ length: N + 1 }, () => new Array(M + 1).fill(-Infinity));
   dp[0][0] = 0;
   for (let i = 1; i <= N; i++) dp[i][0] = dp[i - 1][0] - 1;
@@ -271,11 +281,13 @@ export function alignWordsWithDP(
 
   const imageStart: (number | null)[] = new Array(texts.length).fill(null);
   const imageEnd: (number | null)[] = new Array(texts.length).fill(null);
+  const wordCounts: number[] = new Array(texts.length).fill(0);
 
   for (let eIdx = 0; eIdx < allExpected.length; eIdx++) {
     const wIdx = expectedToWhisper[eIdx];
     if (wIdx === null) continue;
     const imgIdx = allExpected[eIdx].imageIdx;
+    wordCounts[imgIdx]++;
     const wTime = whisperWords[wIdx].start;
     if (imageStart[imgIdx] === null || wTime < imageStart[imgIdx]!) {
       imageStart[imgIdx] = wTime;
@@ -286,7 +298,16 @@ export function alignWordsWithDP(
     }
   }
 
-  // Compute boundaries between images using midpoint of consecutive matched ranges
+  return { wordCounts, imageStart, imageEnd };
+}
+
+export function alignWordsWithDP(
+  texts: string[],
+  whisperWords: WhisperWord[],
+  fps: number
+): number[] {
+  const { imageStart, imageEnd } = assignWordsToImages(texts, whisperWords);
+
   const wStart = whisperWords[0]?.start || 0;
   const wEnd = whisperWords[whisperWords.length - 1]?.end || 0;
   const totalChars = texts.reduce((s, t) => s + t.length, 0);
@@ -318,6 +339,11 @@ export function alignWordsWithDP(
 
 function getAssetPath(...segments: string[]): string {
   return "/" + segments.join("/");
+}
+
+function extractTrackNumber(filePath: string): number {
+  const match = path.basename(filePath).match(/^(\d+)/);
+  return match ? parseInt(match[1], 10) : 0;
 }
 
 async function getAudioDuration(audioPath: string): Promise<number> {
@@ -495,7 +521,7 @@ const SENTIMENT_WEIGHT: Record<Sentiment, number> = {
   dread: 1.3,
 };
 
-const CHAPTER_PAUSE_FRAMES = 60;
+const CHAPTER_PAUSE_FRAMES = 15;
 const TRANSITION_FRAMES = 30;
 
 function analyzeSentiment(text: string): Sentiment {
@@ -524,7 +550,7 @@ function analyzeSentiment(text: string): Sentiment {
   return best;
 }
 
-const NEW_TRANSITIONS: TransitionType[] = ["slide-left", "slide-right", "slide-up", "slide-down", "whip", "3d-flip", "zoom-in", "zoom-out", "pixelate"];
+const NEW_TRANSITIONS: TransitionType[] = ["slide-left", "slide-right", "slide-up", "slide-down", "whip", "zoom-in", "zoom-out", "pixelate"];
 
 function pickNewTransition(seed: number): TransitionType {
   const idx = seed % NEW_TRANSITIONS.length;
@@ -667,7 +693,6 @@ function sentimentToTransition(
         options = [
           { type: "crossfade", weight: 6, duration: 1.5 },
           { type: "fade", weight: 2, duration: 1.2 },
-          { type: "3d-flip", weight: 2, duration: 1.0 },
         ];
       } else {
         options = [
@@ -691,7 +716,6 @@ function sentimentToTransition(
           { type: "fade", weight: 4, duration: 1.2 },
           { type: "crossfade", weight: 3, duration: 1.3 },
           { type: "slide-right", weight: 2, duration: 1.0 },
-          { type: "3d-flip", weight: 1, duration: 1.2 },
         ];
       }
       break;
@@ -734,7 +758,6 @@ function sentimentToTransition(
     case "triumph":
       if (escalation >= 1) {
         options = [
-          { type: "3d-flip", weight: 3, duration: 1.0 },
           { type: "zoom-in", weight: 3, duration: 0.8 },
           { type: "slide-down", weight: 2, duration: 0.8 },
           { type: "radial", weight: 2, duration: 0.7 },
@@ -744,7 +767,6 @@ function sentimentToTransition(
           { type: "crossfade", weight: 3, duration: 1.2 },
           { type: "fade", weight: 3, duration: 1.0 },
           { type: "slide-right", weight: 2, duration: 0.9 },
-          { type: "3d-flip", weight: 2, duration: 1.0 },
         ];
       }
       break;
@@ -1296,7 +1318,11 @@ export async function buildScenes(
   const musicTrackPaths: string[] = [];
 
   if (fs.existsSync(recursosDir)) {
-    const recursos = fs.readdirSync(recursosDir).sort();
+    const recursos = fs.readdirSync(recursosDir).sort((a, b) => {
+      const numA = parseInt(a.match(/^(\d+)/)?.[1] ?? "9999", 10);
+      const numB = parseInt(b.match(/^(\d+)/)?.[1] ?? "9999", 10);
+      return numA - numB;
+    });
     for (const r of recursos) {
       const ext = path.extname(r).toLowerCase();
       const fullPath = path.join(recursosDir, r);
@@ -1314,15 +1340,14 @@ export async function buildScenes(
   const chapterTitlesFromFile = parseChapterTitles(videoDir);
   const guionData = parseGuionChapters(videoDir);
 
-  const musicTracks: MusicTrack[] = [];
-  if (musicTrackPaths.length > 0) {
-    const chaptersPerTrack = Math.max(1, Math.ceil(chapters.length / musicTrackPaths.length));
-    for (let t = 0; t < musicTrackPaths.length; t++) {
-      musicTracks.push({
-        path: musicTrackPaths[t],
-        chapterStart: t * chaptersPerTrack,
-        chapterEnd: Math.min((t + 1) * chaptersPerTrack - 1, chapters.length - 1),
-      });
+  // ─── Pre-compute music track durations for gapless distribution ──────────────
+  const trackDurations: number[] = [];
+  for (const mp of musicTrackPaths) {
+    const fsPath = path.join(videoDir, "recursos", path.basename(mp));
+    if (fs.existsSync(fsPath)) {
+      trackDurations.push(await getAudioDuration(fsPath));
+    } else {
+      trackDurations.push(120);
     }
   }
 
@@ -1357,6 +1382,8 @@ export async function buildScenes(
     const audioDuration = audioFsPath ? await getAudioDuration(audioFsPath) : 10;
 
     let imageMetas: ImageMeta[] = [];
+    let chapterClimate: Climate | undefined;
+    let chapterSilences: { startFrame: number; endFrame: number; durationInFrames: number }[] | undefined;
 
     if (allVisuals.length > 0) {
       // Try direction file first (generated by AI agent)
@@ -1366,13 +1393,21 @@ export async function buildScenes(
         try {
           const directions = JSON.parse(fs.readFileSync(directionsPath, "utf-8"));
           const chapterDir = directions.scenes.find((s: { chapterIndex: number }) => s.chapterIndex === i);
+          if (chapterDir) {
+            chapterClimate = chapterDir.climate;
+            chapterSilences = (chapterDir.silences || []).map((s: { startFrame: number; endFrame: number; durationInFrames: number }) => ({
+              startFrame: s.startFrame,
+              endFrame: s.endFrame,
+              durationInFrames: s.durationInFrames,
+            }));
+          }
           if (chapterDir && chapterDir.images.length > 0) {
             // Check for pre-computed durations from sync-durations
             const allHaveDuration = chapterDir.images.every(
               (img: { durationInFrames?: number }) => typeof img.durationInFrames === "number" && img.durationInFrames > 0
             );
             if (allHaveDuration) {
-              imageMetas = chapterDir.images.map((img: { imageFile: string; durationInFrames: number; sentiment: Sentiment; transitionToNext: TransitionType; transitionDuration: number; kenBurnsStart: number; kenBurnsEnd: number }) => {
+              imageMetas = chapterDir.images.map((img: { imageFile: string; durationInFrames: number; sentiment: Sentiment; transitionToNext: TransitionType; transitionDuration: number; kenBurnsStart: number; kenBurnsEnd: number; protagonist?: string }) => {
                 const visual = allVisuals.find((v) => v.path.endsWith(img.imageFile));
                 return {
                   path: visual?.path || img.imageFile,
@@ -1383,6 +1418,7 @@ export async function buildScenes(
                   sentiment: img.sentiment,
                   kenBurnsStart: img.kenBurnsStart,
                   kenBurnsEnd: img.kenBurnsEnd,
+                  protagonist: img.protagonist,
                 };
               });
               // FIX: solo distribuir la diferencia de redondeo entre las imágenes
@@ -1417,7 +1453,7 @@ export async function buildScenes(
                 sumRaw += raw;
               }
               if (rawFrames.length > 0) rawFrames[rawFrames.length - 1] += totalFrames - sumRaw;
-              imageMetas = chapterDir.images.map((img: { imageFile: string; transitionToNext: TransitionType; transitionDuration: number; sentiment: Sentiment; kenBurnsStart: number; kenBurnsEnd: number }, idx: number) => {
+              imageMetas = chapterDir.images.map((img: { imageFile: string; transitionToNext: TransitionType; transitionDuration: number; sentiment: Sentiment; kenBurnsStart: number; kenBurnsEnd: number; protagonist?: string }, idx: number) => {
                 const visual = allVisuals.find((v) => v.path.endsWith(img.imageFile));
                 return {
                   path: visual?.path || img.imageFile,
@@ -1428,6 +1464,7 @@ export async function buildScenes(
                   sentiment: img.sentiment,
                   kenBurnsStart: img.kenBurnsStart,
                   kenBurnsEnd: img.kenBurnsEnd,
+                  protagonist: img.protagonist,
                 };
               });
             }
@@ -1478,6 +1515,8 @@ export async function buildScenes(
       audioDurationSeconds: audioDuration,
       durationInFrames: imageMetas.reduce((s: number, img: { durationInFrames: number }) => s + img.durationInFrames, 0) + CHAPTER_PAUSE_FRAMES,
       images: imageMetas,
+      climate: chapterClimate,
+      silences: chapterSilences,
     });
 
     console.log(
@@ -1485,6 +1524,155 @@ export async function buildScenes(
       `transiciones: ${[...new Set(imageMetas.map((m) => m.transitionType))].join(", ")}`
     );
   }
+
+  // ─── Chapter-aligned music track distribution ──────────────────────────────
+  const CROSSFADE_FRAMES = 90;
+  const musicTracks: MusicTrack[] = [];
+
+  const sequencesTotal = INTRO_FRAMES
+    + scenes.reduce((sum: number, s: { durationInFrames: number }) => sum + s.durationInFrames, 0)
+    + OUTRO_FRAMES;
+  const interChapterTransitions = scenes.length > 1 ? (scenes.length - 1) * 1 : 0;
+  const transitionsTotal = (scenes.length > 0 ? 2 : 0) * TRANSITION_FRAMES + interChapterTransitions;
+  const visualTotal = sequencesTotal - transitionsTotal;
+
+  if (musicTrackPaths.length > 0) {
+    // Chapter boundaries: absolute frame where each chapter starts
+    const boundaries: number[] = [INTRO_FRAMES];
+    for (const s of scenes) {
+      boundaries.push(boundaries[boundaries.length - 1] + s.durationInFrames);
+    }
+
+    // Build trackSchedule override map: chapterIndex → trackFilename
+    const scheduleOverrides = new Map<number, string>();
+    if (style.trackSchedule) {
+      for (const [chStr, trackFile] of Object.entries(style.trackSchedule)) {
+        const chIdx = parseInt(chStr, 10) - 1;
+        if (chIdx >= 0 && chIdx < scenes.length) {
+          scheduleOverrides.set(chIdx, trackFile);
+        }
+      }
+    }
+
+    // Sequential track pool
+    const seqTracks = musicTrackPaths.map((p, i) => ({
+      path: p,
+      durFrames: Math.round(trackDurations[i] * FPS),
+      trackNumber: extractTrackNumber(p),
+    }));
+
+    interface SegInfo {
+      path: string;
+      startChapter: number;
+      endChapter: number;
+      durFrames: number;
+      trackNumber: number;
+    }
+
+    const segments: SegInfo[] = [];
+    let seqIdx = 0;
+    let chIdx = 0;
+
+    while (chIdx < scenes.length) {
+      let trackPath: string;
+      let trackDur: number;
+      let trackNum: number;
+
+      if (scheduleOverrides.has(chIdx)) {
+        const overrideFile = scheduleOverrides.get(chIdx)!;
+        trackPath = getAssetPath("recursos", overrideFile);
+        const fsPath = path.join(videoDir, "recursos", path.basename(overrideFile));
+        const durSec = fs.existsSync(fsPath) ? await getAudioDuration(fsPath) : 120;
+        trackDur = Math.round(durSec * FPS);
+        trackNum = extractTrackNumber(overrideFile);
+      } else {
+        if (seqIdx >= seqTracks.length) {
+          console.warn(`   ⚠️  Se acabaron las pistas de música secuenciales en capítulo ${chIdx + 1}`);
+          break;
+        }
+        trackPath = seqTracks[seqIdx].path;
+        trackDur = seqTracks[seqIdx].durFrames;
+        trackNum = seqTracks[seqIdx].trackNumber;
+        seqIdx++;
+      }
+
+      const startCH = chIdx;
+      let remaining = trackDur;
+      const isLastTrack = seqIdx >= seqTracks.length;
+
+      // Cover as many full consecutive chapters as possible
+      while (chIdx < scenes.length) {
+        // Non-override tracks: stop before an override boundary
+        if (!scheduleOverrides.has(startCH) && chIdx > startCH && scheduleOverrides.has(chIdx)) {
+          break;
+        }
+        const chDur = scenes[chIdx].durationInFrames;
+        if (isLastTrack || remaining >= chDur) {
+          remaining -= chDur;
+          chIdx++;
+        } else {
+          break;
+        }
+      }
+
+      // Safety: force at least one chapter per segment
+      if (chIdx === startCH) {
+        chIdx = startCH + 1;
+      }
+
+      segments.push({
+        path: trackPath,
+        startChapter: startCH,
+        endChapter: chIdx - 1,
+        durFrames: trackDur,
+        trackNumber: trackNum,
+      });
+
+      // If this was an override, skip any sequential tracks matching the same file
+      if (scheduleOverrides.has(startCH)) {
+        const overrideFile = scheduleOverrides.get(startCH)!;
+        while (seqIdx < seqTracks.length && path.basename(seqTracks[seqIdx].path) === overrideFile) {
+          seqIdx++;
+        }
+      }
+    }
+
+    // Convert segments to MusicTrack[]
+    for (let i = 0; i < segments.length; i++) {
+      const seg = segments[i];
+      const bStart = boundaries[seg.startChapter];
+      const bEnd = boundaries[seg.endChapter + 1];
+      const isFirst = i === 0;
+      const isLast = i === segments.length - 1;
+
+      const actualStart = isFirst ? 0 : bStart - CROSSFADE_FRAMES;
+      const actualEnd = isLast ? visualTotal : bEnd + CROSSFADE_FRAMES;
+      const dur = actualEnd - actualStart;
+
+      musicTracks.push({
+        path: seg.path,
+        startFrame: Math.max(0, actualStart),
+        durationInFrames: Math.max(CROSSFADE_FRAMES, dur),
+        actualFrames: seg.durFrames,
+        trackNumber: seg.trackNumber,
+        chapterStart: seg.startChapter,
+        chapterEnd: seg.endChapter,
+      });
+    }
+  }
+
+  // ─── Fallback: single track for entire video ──────────────────────────
+  if (musicTracks.length === 0 && backgroundMusic) {
+    musicTracks.push({
+      path: backgroundMusic,
+      startFrame: 0,
+      durationInFrames: visualTotal,
+      actualFrames: visualTotal,
+      trackNumber: 0,
+    });
+  }
+
+
 
   return {
     scenes,

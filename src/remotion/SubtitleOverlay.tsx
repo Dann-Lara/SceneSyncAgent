@@ -5,6 +5,7 @@ interface SubtitleOverlayProps {
   currentFrame: number;
   fps: number;
   style: ChannelStyle;
+  primaryColor?: string;
 }
 
 export const SubtitleOverlay: React.FC<SubtitleOverlayProps> = ({
@@ -12,6 +13,7 @@ export const SubtitleOverlay: React.FC<SubtitleOverlayProps> = ({
   currentFrame,
   fps,
   style,
+  primaryColor: propPrimary,
 }) => {
   if (!subtitles || subtitles.length === 0) return null;
 
@@ -23,13 +25,15 @@ export const SubtitleOverlay: React.FC<SubtitleOverlayProps> = ({
 
   if (!activeSubtitle) return null;
 
+  const accentColor = propPrimary ?? style.primaryColor;
+
   return (
     <div style={subtitleContainer}>
       <div
         style={{
           ...subtitleBox,
           color: "#fff",
-          borderBottom: `3px solid ${style.primaryColor}`,
+          borderBottom: `3px solid ${accentColor}`,
         }}
       >
         {activeSubtitle.text}

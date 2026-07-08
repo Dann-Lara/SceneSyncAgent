@@ -2,21 +2,13 @@ import * as fs from "node:fs";
 import * as path from "node:path";
 import type { TransitionType, Sentiment, DirectionImage, DirectionChapter, VideoDirections } from "../types";
 
+const FPS = 30;
+
 const ALL_16_TRANSITIONS: TransitionType[] = [
   "fade", "radial", "glitch", "flash", "zoom-blur", "shatter",
   "crossfade", "slide-left", "slide-right", "slide-up", "slide-down",
   "whip", "zoom-in", "zoom-out", "pixelate",
 ];
-
-const AVAILABLE_EFFECTS = {
-  ParticleOverlay: "partículas flotando, fondo narrativo oscuro",
-  LightLeak: "fugas de luz atmosféricas - usar en Intro/Outro",
-  KineticText: "animaciones de texto: pop, slide-left, slide-up, scale, typewriter",
-  PunchText: "texto impactante: shake, glitch",
-  CrtChannelChange: "efecto cambio de canal CRT entre capítulos",
-  ProgressBar: "barra de progreso narrativa",
-  BreatherOverlay: "pausa reflexiva con respiro visual",
-};
 
 const TRANSITION_BY_CONTEXT: Record<string, { type: TransitionType; duration: number }[]> = {
   "introduccion-calma": [
@@ -106,10 +98,7 @@ const TRANSITION_BY_CONTEXT: Record<string, { type: TransitionType; duration: nu
   ],
 };
 
-function analyzeParagraphContext(
-  text: string,
-  prevText: string | null
-): {
+function analyzeParagraphContext(text: string): {
   context: keyof typeof TRANSITION_BY_CONTEXT;
   sentiment: Sentiment;
 } {
@@ -135,15 +124,12 @@ function analyzeParagraphContext(
   const triumphScore = triumphWords.filter(w => lower.includes(w)).length;
   const dreadScore = dreadWords.filter(w => lower.includes(w)).length;
 
-  const isShift = prevText && !text.includes(prevText.slice(0, 30));
-
   if (terrorScore >= 2) return { context: "terror-impacto", sentiment: "terror" };
   if (dreadScore >= 2) return { context: "pavor-inminente", sentiment: "dread" };
   if (rageScore >= 2) return { context: "ira-explosiva", sentiment: "rage" };
   if (dramaScore >= 2 && tensionScore >= 1) return { context: "climax-drama", sentiment: "drama" };
   if (dramaScore >= 2) return { context: "sostenido-drama", sentiment: "drama" };
   if (tensionScore >= 2) return { context: "tension-creciente", sentiment: "tension" };
-  if (tensionScore >= 1 && isShift) return { context: "tension-creciente", sentiment: "tension" };
   if (despairScore >= 1) return { context: "desesperacion", sentiment: "despair" };
   if (mysteryScore >= 1) return { context: "misterio-intriga", sentiment: "mystery" };
   if (triumphScore >= 1) return { context: "triunfo-poder", sentiment: "triumph" };
@@ -185,159 +171,138 @@ function kenBurnsForContext(
   }
 }
 
-export function generateDirections(
-  videoDir: string
-): VideoDirections {
-  const guionPath = path.join(videoDir, "guion.md");
-  if (!fs.existsSync(guionPath)) {
-    console.warn("⚠️  No guion.md found, skipping direction generation");
-    return { scenes: [] };
-  }
+interface DireccionTextImage {
+  imageFile: string;
+  frames: number;
+  text: string;
+}
 
-  const content = fs.readFileSync(guionPath, "utf-8");
-  const sections = content.split(/^#\s+c(\d+)/m);
+interface DireccionTextChapter {
+  chapterIndex: number;
+  images: DireccionTextImage[];
+}
 
-  const directions: VideoDirections = { scenes: [] };
+function parseDireccionTexto(content: string): DireccionTextChapter[] {
+  const chapters: DireccionTextChapter[] = [];
 
-  for (let i = 1; i < sections.length; i += 2) {
-    const chapterIdx = parseInt(sections[i], 10) - 1;
-    const body = sections[i + 1].trim();
-    const rawParagraphs = body.split(/\n\n+/).filter((p) => p.trim().length > 0);
+  const chapterBlocks = content.split(/^=== /m).filter(Boolean);
 
-    // Collect clean paragraphs (strip tags and breaks for context analysis)
-    // IMPORTANT: keep ALL entries, including standalone <break> paragraphs,
-    // so textInclude preserves the complete raw text including breaks.
-    const cleanParagraphs: { original: string; clean: string; breakTime: number }[] = [];
-    for (const raw of rawParagraphs) {
-      let text = raw.trim();
-      const breakMatches = [...text.matchAll(/<break\s+time="([\d.]+)s"\s*\/>/g)];
-      let totalBreak = 0;
-      for (const bm of breakMatches) totalBreak += parseFloat(bm[1]);
-      text = text.replace(/<break\s+time="[\d.]+s"\s*\/>/g, "").trim();
-      text = text.replace(/\[.*?\]/g, "").trim();
-      text = text.replace(/\s+/g, " ").trim();
-      cleanParagraphs.push({ original: raw, clean: text, breakTime: totalBreak });
-    }
+  for (const block of chapterBlocks) {
+    const headerMatch = block.match(/^capitulo-\d+ \(chapterIndex (\d+)\) ===/);
+    if (!headerMatch) continue;
+    const chapterIndex = parseInt(headerMatch[1], 10);
 
-    // Determine how many images exist for this chapter
-    const chapterDir = path.join(
-      videoDir,
-      `capitulo-${String(chapterIdx + 1).padStart(2, "0")}`
-    );
-    const imageFiles: string[] = [];
-    if (fs.existsSync(chapterDir)) {
-      const files = fs.readdirSync(chapterDir).sort();
-      const VALID_IMAGE_EXTS = [".jpg", ".jpeg", ".png", ".webp"];
-      for (const f of files) {
-        if (VALID_IMAGE_EXTS.includes(path.extname(f).toLowerCase())) {
-          imageFiles.push(f);
+    const images: DireccionTextImage[] = [];
+
+    const lines = block.split(/\r?\n/);
+    let currentImage: Partial<DireccionTextImage> | null = null;
+    let inText = false;
+    let textBuffer: string[] = [];
+
+    for (const line of lines) {
+      const imgHeaderMatch = line.match(/^\s*---\s+([\w.-]+)\s+\((\d+)f\s*=\s*[\d.]+s\)\s*---/);
+      if (imgHeaderMatch) {
+        if (currentImage && textBuffer.length > 0) {
+          currentImage.text = textBuffer.join("\n").replace(/^'|'$/g, "").trim();
+          if (currentImage.imageFile && currentImage.frames && currentImage.text) {
+            images.push({
+              imageFile: currentImage.imageFile,
+              frames: currentImage.frames,
+              text: currentImage.text,
+            });
+          }
         }
-      }
-    }
-
-    if (cleanParagraphs.length === 0 || imageFiles.length === 0) {
-      console.warn(`   ⚠️  Chapter ${chapterIdx + 1}: no paragraphs or images`);
-      directions.scenes.push({
-        chapterIndex: chapterIdx,
-        images: imageFiles.map((f, idx) => ({
-          imageFile: f,
-          textInclude: "",
-          scriptParagraphs: [idx],
-          transitionToNext: "fade",
-          transitionDuration: 0.8,
-          kenBurnsStart: 1.0,
-          kenBurnsEnd: 1.08,
-          sentiment: "calm",
-          contextNote: "default",
-        })),
-      });
-      continue;
-    }
-
-    // Smart grouping: detect topic shifts between paragraphs
-    const groups: { paragraphIndices: number[]; context: keyof typeof TRANSITION_BY_CONTEXT; sentiment: Sentiment }[] = [];
-    let currentGroup: number[] = [0];
-    let prevContext = analyzeParagraphContext(cleanParagraphs[0].clean, null);
-
-    for (let p = 1; p < cleanParagraphs.length; p++) {
-      const curr = analyzeParagraphContext(cleanParagraphs[p].clean, cleanParagraphs[p - 1].clean);
-      const isBreak = cleanParagraphs[p - 1].breakTime >= 2.0;
-      const isBigShift = curr.context !== prevContext.context || isBreak;
-
-      if (isBigShift && currentGroup.length > 0) {
-        groups.push({
-          paragraphIndices: [...currentGroup],
-          context: prevContext.context,
-          sentiment: prevContext.sentiment,
-        });
-        currentGroup = [p];
-      } else {
-        currentGroup.push(p);
-      }
-      prevContext = curr;
-    }
-    if (currentGroup.length > 0) {
-      groups.push({
-        paragraphIndices: [...currentGroup],
-        context: prevContext.context,
-        sentiment: prevContext.sentiment,
-      });
-    }
-
-    // Distribute images to groups
-    const chapterImages: DirectionImage[] = [];
-    for (let g = 0; g < groups.length; g++) {
-      const group = groups[g];
-      const imageIdx = Math.min(g, imageFiles.length - 1);
-      const isLast = g === groups.length - 1;
-
-      if (g >= imageFiles.length) {
-        // More groups than images — merge into last image
-        const lastImg = chapterImages[chapterImages.length - 1];
-        if (lastImg) {
-          lastImg.scriptParagraphs.push(...group.paragraphIndices);
-        }
+        currentImage = {
+          imageFile: imgHeaderMatch[1],
+          frames: parseInt(imgHeaderMatch[2], 10),
+        };
+        textBuffer = [];
+        inText = false;
         continue;
       }
 
-      const options = TRANSITION_BY_CONTEXT[group.context] || TRANSITION_BY_CONTEXT["introduccion-calma"];
-      const transition = pickTransition(options, g + chapterIdx * 7);
-      const kenBurns = kenBurnsForContext(group.context);
+      if (currentImage) {
+        const textLine = line.trim();
+        if (textLine.startsWith("'") || inText) {
+          inText = true;
+          textBuffer.push(line);
+          if (textLine.endsWith("'")) {
+            currentImage.text = textBuffer.join("\n").replace(/^'|'$/g, "").trim();
+            if (currentImage.imageFile && currentImage.frames && currentImage.text) {
+              images.push({
+                imageFile: currentImage.imageFile,
+                frames: currentImage.frames,
+                text: currentImage.text,
+              });
+            }
+            currentImage = null;
+            textBuffer = [];
+            inText = false;
+          }
+        }
+      }
+    }
 
-      const rawText = group.paragraphIndices
-        .map((pi) => cleanParagraphs[pi].original)
-        .join("\n\n");
+    // Flush remaining
+    if (currentImage && textBuffer.length > 0) {
+      currentImage.text = textBuffer.join("\n").replace(/^'|'$/g, "").trim();
+      if (currentImage.imageFile && currentImage.frames && currentImage.text) {
+        images.push({
+          imageFile: currentImage.imageFile,
+          frames: currentImage.frames,
+          text: currentImage.text,
+        });
+      }
+    }
+
+    if (images.length > 0) {
+      chapters.push({ chapterIndex, images });
+    }
+  }
+
+  return chapters;
+}
+
+function generateFromDireccionTexto(videoDir: string): VideoDirections {
+  const textoPath = path.join(videoDir, "direccion-texto.txt");
+  if (!fs.existsSync(textoPath)) {
+    console.error("❌ direccion-texto.txt not found in", videoDir);
+    return { scenes: [] };
+  }
+
+  const content = fs.readFileSync(textoPath, "utf-8");
+  const parsed = parseDireccionTexto(content);
+
+  const directions: VideoDirections = { scenes: [] };
+
+  for (const ch of parsed) {
+    const chapterImages: DirectionImage[] = [];
+
+    for (let i = 0; i < ch.images.length; i++) {
+      const img = ch.images[i];
+      const isLast = i === ch.images.length - 1;
+
+      const { context, sentiment } = analyzeParagraphContext(img.text);
+      const options = TRANSITION_BY_CONTEXT[context] || TRANSITION_BY_CONTEXT["introduccion-calma"];
+      const transition = pickTransition(options, i + ch.chapterIndex * 7);
+      const kenBurns = kenBurnsForContext(context);
+
       chapterImages.push({
-        imageFile: imageFiles[imageIdx],
-        textInclude: rawText,
-        scriptParagraphs: group.paragraphIndices,
+        imageFile: img.imageFile,
+        textInclude: img.text,
+        scriptParagraphs: [i],
         transitionToNext: isLast ? "fade" : transition.type,
         transitionDuration: isLast ? 1.0 : transition.duration,
         kenBurnsStart: kenBurns.start,
         kenBurnsEnd: kenBurns.end,
-        sentiment: group.sentiment,
-        contextNote: group.context,
-      });
-    }
-
-    // Handle remaining images (more images than groups)
-    for (let g = groups.length; g < imageFiles.length; g++) {
-      const lastIdx = cleanParagraphs.length - 1;
-      chapterImages.push({
-        imageFile: imageFiles[g],
-        textInclude: lastIdx >= 0 ? cleanParagraphs[lastIdx].original : "",
-        scriptParagraphs: [lastIdx >= 0 ? lastIdx : 0],
-        transitionToNext: g < imageFiles.length - 1 ? "fade" : "fade",
-        transitionDuration: 0.8,
-        kenBurnsStart: 1.0,
-        kenBurnsEnd: 1.08,
-        sentiment: "calm",
-        contextNote: "extra image, merged with last group",
+        sentiment,
+        contextNote: context,
+        durationInFrames: img.frames,
       });
     }
 
     directions.scenes.push({
-      chapterIndex: chapterIdx,
+      chapterIndex: ch.chapterIndex,
       images: chapterImages,
     });
   }
@@ -346,18 +311,19 @@ export function generateDirections(
 }
 
 // CLI usage
-if (process.argv[1]?.endsWith("generate-directions.ts")) {
+if (process.argv[1]?.endsWith("generate-from-direccion-texto.ts")) {
   const videoDir = process.argv[2];
   if (!videoDir) {
-    console.error("❌ Uso: npx tsx src/scripts/generate-directions.ts <directorio-del-video>");
+    console.error("❌ Uso: npx tsx src/scripts/generate-from-direccion-texto.ts <directorio-del-video>");
     process.exit(1);
   }
 
-  const directions = generateDirections(videoDir);
+  const directions = generateFromDireccionTexto(videoDir);
   const outputPath = path.join(videoDir, "direccion.json");
   fs.writeFileSync(outputPath, JSON.stringify(directions, null, 2), "utf-8");
-  console.log(`✅ Direcciones guardadas en: ${outputPath}`);
+  console.log(`✅ direccion.json generado desde direccion-texto.txt: ${outputPath}`);
 
   const totalImages = directions.scenes.reduce((s, sc) => s + sc.images.length, 0);
-  console.log(`   ${directions.scenes.length} capítulos, ${totalImages} imágenes asignadas por contexto`);
+  const totalFrames = directions.scenes.reduce((s, sc) => s + sc.images.reduce((si, img) => si + (img.durationInFrames || 0), 0), 0);
+  console.log(`   ${directions.scenes.length} capítulos, ${totalImages} imágenes, ${totalFrames} frames totales`);
 }

@@ -15,6 +15,8 @@ interface ChapterProps {
   isFirst: boolean;
   isLast: boolean;
   transitionDuration: number;
+  totalChapters: number;
+  protagonistPalettes?: Record<string, { primaryColor: string; secondaryColor: string }>;
 }
 
 export const ChapterScene: React.FC<ChapterProps> = ({
@@ -24,24 +26,31 @@ export const ChapterScene: React.FC<ChapterProps> = ({
   isFirst,
   isLast,
   transitionDuration,
+  totalChapters,
+  protagonistPalettes,
 }) => {
   const { fps } = useVideoConfig();
 
   const isPause = currentFrame >= scene.durationInFrames - CHAPTER_PAUSE;
+  const isListaEdge = style.videoType === "lista" && (scene.chapterIndex === 0 || scene.chapterIndex === totalChapters - 1);
+
+  let primaryColor = style.primaryColor;
+  let secondaryColor = style.secondaryColor;
 
   if (scene.images.length === 0) {
     return (
       <div style={chapterContainer(style)}>
-        {isPause ? (
-          <CrtChannelChange />
-        ) : (
-          <>
-            <ChapterTitleCard scene={scene} style={style} currentFrame={currentFrame} fps={fps} />
+          {isPause ? (
+            <CrtChannelChange />
+          ) : (
+            <>
+              {!isListaEdge && <ChapterTitleCard scene={scene} style={style} currentFrame={currentFrame} fps={fps} totalChapters={totalChapters} primaryColor={primaryColor} />}
             <SubtitleOverlay
               subtitles={scene.subtitles}
               currentFrame={currentFrame}
               fps={fps}
               style={style}
+              primaryColor={primaryColor}
             />
           </>
         )}
@@ -50,7 +59,7 @@ export const ChapterScene: React.FC<ChapterProps> = ({
   }
 
   const titleCardFrames = 5 * fps;
-  const showTitleCard = currentFrame < titleCardFrames && !isPause;
+  const showTitleCard = currentFrame < titleCardFrames && !isPause && !isListaEdge;
 
   let frameInImage = currentFrame;
   let currentImageIndex = 0;
@@ -74,13 +83,38 @@ export const ChapterScene: React.FC<ChapterProps> = ({
   const nextImage = currentImageIndex < scene.images.length - 1
     ? scene.images[currentImageIndex + 1]
     : undefined;
+  const prevImage = currentImageIndex > 0
+    ? scene.images[currentImageIndex - 1]
+    : undefined;
 
   const imageDuration = image.durationInFrames;
-  const transitionFrames = Math.round(image.transitionDuration * fps);
-  const showTransition = nextImage && frameInImage > imageDuration - transitionFrames && !isPause;
-  const transitionProgress = showTransition
-    ? (frameInImage - (imageDuration - transitionFrames)) / transitionFrames
-    : 0;
+
+  const currentProtagonist = image.protagonist;
+  const protagonistPalette = currentProtagonist && protagonistPalettes ? protagonistPalettes[currentProtagonist] : undefined;
+  if (protagonistPalette) {
+    primaryColor = protagonistPalette.primaryColor;
+    secondaryColor = protagonistPalette.secondaryColor;
+  }
+
+  // Forward transition: last half of transitionFrames from this image
+  const fwdTotal = Math.round(image.transitionDuration * fps);
+  const fwdHalf = Math.max(1, Math.round(fwdTotal / 2));
+  const showFwd = nextImage && frameInImage > imageDuration - fwdHalf && !isPause;
+
+  // Backward transition: first half of transitionFrames from this image (carried over from prev)
+  const bwdTotal = Math.round((prevImage?.transitionDuration ?? 0) * fps);
+  const bwdHalf = Math.max(1, Math.round(bwdTotal / 2));
+  const showBwd = prevImage && frameInImage < bwdHalf && !isPause;
+
+  // progress: 0→0.5 during showFwd, 0.5→1 during showBwd (continuous across the boundary)
+  let p = 0;
+  let tType = image.transitionType;
+  if (showFwd) {
+    p = (frameInImage - (imageDuration - fwdHalf)) / fwdTotal;
+  } else if (showBwd) {
+    p = (bwdHalf + frameInImage) / bwdTotal;
+    tType = prevImage!.transitionType;
+  }
 
   const opacity = interpolate(frameInImage, [0, Math.min(15, imageDuration * 0.1)], [0, 1], {
     extrapolateLeft: "clamp",
@@ -99,20 +133,40 @@ export const ChapterScene: React.FC<ChapterProps> = ({
     { extrapolateLeft: "clamp", extrapolateRight: "clamp" }
   );
 
-  const currentOpacity = showTransition ? applyTransition(transitionProgress, image.transitionType) : opacity;
-  const overlay = getTransitionOverlay(transitionProgress, image.transitionType, style.primaryColor);
-  const nextOverlay = showTransition
-    ? getTransitionOverlay(transitionProgress, nextImage!.transitionType, style.primaryColor)
+  let currentOpacityValue: number;
+  if (showFwd) {
+    currentOpacityValue = 1 - p;
+  } else if (showBwd) {
+    currentOpacityValue = p;
+  } else if (prevImage && frameInImage >= bwdHalf) {
+    // After backward transition (p reached 1.0), skip fade-in — already full opacity
+    currentOpacityValue = 1;
+  } else {
+    currentOpacityValue = opacity;
+  }
+  const mainOpacity = chapterFadeIn * currentOpacityValue;
+
+  const nextOpacity = showFwd ? p : 0;
+  const prevOpacity = showBwd ? 1 - p : 0;
+
+  const overlay = showFwd || showBwd ? getTransitionOverlay(p, tType, primaryColor) : null;
+  const nextOverlay = showFwd
+    ? getTransitionOverlay(p, image.transitionType, primaryColor)
+    : null;
+  const prevOverlay = showBwd
+    ? getTransitionOverlay(p, prevImage!.transitionType, primaryColor)
     : null;
 
   return (
     <div style={chapterContainer(style)}>
+      {!isPause && (
+        <>
       <div
         style={{
           position: "absolute",
           inset: 0,
-          transform: `scale(${kenBurnsScale})${showTransition ? " " + getTransitionTransform(transitionProgress, image.transitionType) : ""}`,
-          opacity: chapterFadeIn * (showTransition ? applyTransition(transitionProgress, image.transitionType) : opacity),
+          transform: `scale(${kenBurnsScale})${showFwd ? " " + getTransitionTransform(p, image.transitionType) : ""}`,
+          opacity: mainOpacity,
         }}
       >
         <Img
@@ -122,13 +176,13 @@ export const ChapterScene: React.FC<ChapterProps> = ({
         <div style={overlayGradient} />
       </div>
 
-      {nextImage && showTransition && (
+      {nextImage && showFwd && (
         <div
           style={{
             position: "absolute",
             inset: 0,
-            opacity: chapterFadeIn * applyTransition(transitionProgress, nextImage.transitionType),
-            transform: getTransitionTransform(transitionProgress, nextImage.transitionType),
+            opacity: chapterFadeIn * nextOpacity,
+            transform: getTransitionTransform(p, image.transitionType),
           }}
         >
           <Img
@@ -139,60 +193,84 @@ export const ChapterScene: React.FC<ChapterProps> = ({
         </div>
       )}
 
-      {overlay && <div style={overlay} />}
-      {nextOverlay && showTransition && <div style={nextOverlay} />}
-
-      {showTitleCard && (
-        <ChapterTitleCard scene={scene} style={style} currentFrame={currentFrame} fps={fps} />
+      {prevImage && showBwd && (
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            opacity: chapterFadeIn * prevOpacity,
+            transform: getTransitionTransform(p, prevImage!.transitionType),
+          }}
+        >
+          <Img
+            src={staticFile(prevImage.path)}
+            style={imageFill}
+          />
+          <div style={overlayGradient} />
+        </div>
       )}
 
-      {!isPause && (
-        <SubtitleOverlay
-          subtitles={scene.subtitles}
-          currentFrame={currentFrame}
-          fps={fps}
-          style={style}
-        />
+      {overlay && <div style={overlay} />}
+      {nextOverlay && showFwd && <div style={nextOverlay} />}
+      {prevOverlay && showBwd && <div style={prevOverlay} />}
+
+      {showTitleCard && (
+        <ChapterTitleCard scene={scene} style={style} currentFrame={currentFrame} fps={fps} totalChapters={totalChapters} primaryColor={primaryColor} />
+      )}
+
+      <SubtitleOverlay
+        subtitles={scene.subtitles}
+        currentFrame={currentFrame}
+        fps={fps}
+        style={style}
+        primaryColor={primaryColor}
+      />
+
+      <ParticleOverlay
+        frame={currentFrame}
+        count={15}
+        color={primaryColor}
+        speed={0.3}
+        sizeRange={[1, 3]}
+        opacityRange={[0.02, 0.08]}
+      />
+
+      <SceneOverlays sentiment={image.sentiment} color={primaryColor} climate={scene.climate} />
+
+      <GlowShader />
+      </>
       )}
 
       {isPause && (
         <CrtChannelChange />
       )}
 
+      {!isListaEdge && (
       <ProgressBar
         frame={currentFrame}
         totalFrames={scene.durationInFrames}
-        color={style.primaryColor}
+        color={primaryColor}
         chapterIndex={scene.chapterIndex}
-        totalChapters={12}
+        totalChapters={totalChapters}
+        displayIndex={style.videoType === "lista" && scene.chapterIndex > 0 ? scene.chapterIndex : undefined}
+        displayTotal={style.videoType === "lista" ? totalChapters - 2 : undefined}
       />
-
-      <ParticleOverlay
-        frame={currentFrame}
-        count={15}
-        color={style.primaryColor}
-        speed={0.3}
-        sizeRange={[1, 3]}
-        opacityRange={[0.02, 0.08]}
-      />
-
-      {!isPause && (
-        <SceneOverlays sentiment={image.sentiment} color={style.primaryColor} />
       )}
-
-      {!isPause && <GlowShader />}
     </div>
   );
 };
 
-const CHAPTER_PAUSE = 60;
+const CHAPTER_PAUSE = 15;
 
 const ChapterTitleCard: React.FC<{
   scene: Scene;
   style: ChannelStyle;
   currentFrame: number;
   fps: number;
-}> = ({ scene, style, currentFrame, fps }) => {
+  totalChapters: number;
+  primaryColor?: string;
+}> = ({ scene, style, currentFrame, fps, totalChapters, primaryColor: propPrimary }) => {
+  const primaryColor = propPrimary ?? style.primaryColor;
   const titleCardTotal = 5 * fps;
   const titleProgress = currentFrame / titleCardTotal;
 
@@ -209,6 +287,95 @@ const ChapterTitleCard: React.FC<{
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
   });
+
+  if (style.videoType === "lista") {
+    const circSpring = spring({
+      frame: currentFrame,
+      fps,
+      config: { damping: 10, mass: 0.6, stiffness: 120 },
+    });
+    const circScale = interpolate(circSpring, [0, 1], [0.3, 1], { extrapolateRight: "clamp" });
+
+    const numFade = interpolate(currentFrame, [0, 12], [0, 1], {
+      extrapolateLeft: "clamp", extrapolateRight: "clamp",
+    });
+
+    const titleSlide = interpolate(currentFrame, [10, 35], [30, 0], {
+      extrapolateLeft: "clamp", extrapolateRight: "clamp",
+    });
+    const titleFade = interpolate(currentFrame, [10, 35], [0, 1], {
+      extrapolateLeft: "clamp", extrapolateRight: "clamp",
+    });
+
+    return (
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          opacity: titleOpacity,
+          zIndex: 10,
+          pointerEvents: "none",
+        }}
+      >
+        <div
+          style={{
+            backgroundColor: "rgba(0,0,0,0.85)",
+            backdropFilter: "blur(10px)",
+            WebkitBackdropFilter: "blur(10px)",
+            padding: "50px 80px 40px 80px",
+            borderRadius: 16,
+            boxShadow: `0 8px 60px rgba(0,0,0,0.8), 0 0 ${80 * glowPulse}px ${primaryColor}33`,
+            textAlign: "center",
+          }}
+        >
+          <div
+            style={{
+              width: 160,
+              height: 160,
+              borderRadius: "50%",
+              border: `4px solid ${primaryColor}`,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              margin: "0 auto 24px auto",
+              transform: `scale(${circScale})`,
+              boxShadow: `0 0 50px ${primaryColor}44, inset 0 0 40px ${primaryColor}22`,
+              backgroundColor: "rgba(0,0,0,0.5)",
+            }}
+          >
+            <span
+              style={{
+                color: primaryColor,
+                fontSize: 68,
+                fontWeight: 900,
+                fontFamily: "'Courier New', monospace",
+                opacity: numFade,
+                textShadow: `0 0 30px ${primaryColor}88`,
+              }}
+            >
+              {String(scene.chapterIndex).padStart(2, "0")}
+            </span>
+          </div>
+          <div
+            style={{
+              color: "#ffffff",
+              fontSize: 40,
+              fontWeight: 700,
+              lineHeight: 1.3,
+              transform: `translateY(${titleSlide}px)`,
+              opacity: titleFade,
+              textShadow: `0 2px 15px rgba(0,0,0,0.5)`,
+            }}
+          >
+            {scene.title}
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div
@@ -230,22 +397,22 @@ const ChapterTitleCard: React.FC<{
           backgroundColor: "rgba(0,0,0,0.9)",
           backdropFilter: "blur(8px)",
           WebkitBackdropFilter: "blur(8px)",
-          padding: "24px 36px 28px 36px",
+          padding: "32px 52px 36px 52px",
           borderRadius: 6,
-          borderLeft: `3px solid ${style.primaryColor}`,
-          boxShadow: `0 4px 40px rgba(0,0,0,0.7), 0 0 ${60 * glowPulse}px ${style.primaryColor}55`,
+          borderLeft: `3px solid ${primaryColor}`,
+          boxShadow: `0 4px 40px rgba(0,0,0,0.7), 0 0 ${60 * glowPulse}px ${primaryColor}55`,
           maxWidth: 800,
         }}
       >
         <div
           style={{
             color: "#ffffff",
-            fontSize: 15,
+            fontSize: 23,
             letterSpacing: 4,
             textTransform: "uppercase",
             fontWeight: 700,
             marginBottom: 10,
-            textShadow: `0 0 20px ${style.primaryColor}66`,
+            textShadow: `0 0 20px ${primaryColor}66`,
           }}
         >
           &gt;&gt; CAPÍTULO {String(scene.chapterIndex + 1).padStart(2, "0")}
@@ -253,10 +420,10 @@ const ChapterTitleCard: React.FC<{
         <div
           style={{
             color: "#ffffff",
-            fontSize: 36,
+            fontSize: 54,
             fontWeight: 500,
             lineHeight: 1.35,
-            textShadow: `0 2px 15px rgba(0,0,0,0.5), 0 0 ${20 * glowPulse}px ${style.primaryColor}66`,
+            textShadow: `0 2px 15px rgba(0,0,0,0.5), 0 0 ${20 * glowPulse}px ${primaryColor}66`,
           }}
         >
           {scene.title}

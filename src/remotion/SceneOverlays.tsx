@@ -1,13 +1,15 @@
 import { interpolate, useCurrentFrame, useVideoConfig } from "remotion";
-import type { Sentiment } from "../types";
+import type { Sentiment, Climate } from "../types";
 import { useMemo } from "react";
+import { Storm, boltPoints } from "./Storm";
 
 interface SceneOverlaysProps {
   sentiment: Sentiment;
   color: string;
+  climate?: Climate;
 }
 
-export const SceneOverlays: React.FC<SceneOverlaysProps> = ({ sentiment, color }) => {
+export const SceneOverlays: React.FC<SceneOverlaysProps> = ({ sentiment, color, climate }) => {
   const frame = useCurrentFrame();
   const { fps, width, height } = useVideoConfig();
 
@@ -22,7 +24,7 @@ export const SceneOverlays: React.FC<SceneOverlaysProps> = ({ sentiment, color }
       case "rage":       return <FractureLightning frame={frame} fps={fps} width={width} height={height} color={color} />;
       case "terror":     return <GlitchReticle frame={frame} fps={fps} width={width} height={height} color={color} />;
       case "triumph":    return <AscendingPulse frame={frame} fps={fps} width={width} height={height} color={color} />;
-      case "resolution": return <WaveformDecay frame={frame} fps={fps} width={width} height={height} color={color} />;
+      case "resolution": return null;
     }
   })();
 
@@ -32,6 +34,9 @@ export const SceneOverlays: React.FC<SceneOverlaysProps> = ({ sentiment, color }
       <WeldingSpark frame={frame} fps={fps} width={width} height={height} color={color} />
       <TriGrid frame={frame} fps={fps} width={width} height={height} color={color} />
       <MicroPulse frame={frame} fps={fps} width={width} height={height} color={color} />
+      {climate && climate !== "clear" && (
+        <Storm frame={frame} fps={fps} width={width} height={height} color={color} climate={climate} />
+      )}
     </>
   );
 };
@@ -336,23 +341,6 @@ const FallingAshes: React.FC<OverlayProps> = ({ frame, width, height, color }) =
 };
 
 // ─── RAGE: FractureLightning con zigzag real y ramificaciones ────────────────
-function boltPoints(
-  startX: number, startY: number,
-  endX: number, endY: number,
-  seed: number
-): string {
-  const steps = 9;
-  const pts: [number, number][] = [[startX, startY]];
-  for (let s = 1; s < steps; s++) {
-    const t = s / steps;
-    const bx = startX + (endX - startX) * t;
-    const by = startY + (endY - startY) * t;
-    const jitter = Math.sin(s * 3.7 + seed * 7.3) * 22 * (1 - t * 0.5);
-    pts.push([bx + jitter, by]);
-  }
-  pts.push([endX, endY]);
-  return pts.map(p => p.join(",")).join(" ");
-}
 
 const FractureLightning: React.FC<OverlayProps> = ({ frame, fps, width, height, color }) => {
   const boltCount = 3;
@@ -487,22 +475,6 @@ const AscendingPulse: React.FC<OverlayProps> = ({ frame, fps, width, height, col
   );
 };
 
-// ─── RESOLUTION: WaveformDecay (original, funciona bien) ─────────────────────
-const WaveformDecay: React.FC<OverlayProps> = ({ frame, fps, width, height, color }) => {
-  const amplitude = interpolate(frame, [0, fps * 5], [15, 2]);
-  const points = Array.from({ length: 80 }).map((_, i) => {
-    const x = (i / 80) * width;
-    const t = frame * 0.05 + i * 0.08;
-    const y = height - 80 + Math.sin(t) * amplitude * Math.max(0, 1 - frame / (fps * 6));
-    return `${x},${y}`;
-  }).join(" ");
-  return (
-    <svg viewBox={`0 0 ${width} ${height}`} style={overlayStyle}>
-      <polyline points={points} fill="none" stroke={color} strokeWidth={2} opacity={0.45} />
-    </svg>
-  );
-};
-
 // ─── GLOBALES (sin cambios) ───────────────────────────────────────────────────
 const WeldingSpark: React.FC<OverlayProps> = ({ frame, width, height, color }) => {
   const sparks = useMemo(() =>
@@ -591,6 +563,8 @@ const MicroPulse: React.FC<OverlayProps> = ({ frame, width, height, color }) => 
     </svg>
   );
 };
+
+// ─── STORM ahora importado de ./Storm ──────────────────────────────────────────
 
 const overlayStyle: React.CSSProperties = {
   position: "absolute",
