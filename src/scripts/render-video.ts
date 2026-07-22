@@ -28,6 +28,16 @@ async function renderVideo(videoDir: string, outputPath: string): Promise<void> 
     sceneData.scenes = [sceneData.scenes[idx]];
   }
 
+  // Test: rango de capítulos (mantiene intro y outro)
+  const rangeArg = process.argv.includes("--range") ? process.argv[process.argv.indexOf("--range") + 1] : "";
+  if (rangeArg && rangeArg.includes("-")) {
+    const [start, end] = rangeArg.split("-").map(Number);
+    if (start >= 1 && end >= start && end <= sceneData.scenes.length) {
+      sceneData.scenes = sceneData.scenes.slice(start - 1, end);
+      console.log(`   🧪 Test range: capítulos ${start}-${end} (${sceneData.scenes.length} escenas)`);
+    }
+  }
+
   const inputProps: VideoInput = {
     channelStyle: style,
     scenes: sceneData.scenes,

@@ -336,7 +336,7 @@ export const Intro: React.FC<IntroProps> = ({ duration, channelStyle }) => {
         }}
       />
 
-      {/* TÍTULO con backdrop */}
+      {/* TÍTULO con backdrop — fontSize responsivo */}
       <div
         style={{
           position: "absolute",
@@ -363,7 +363,7 @@ export const Intro: React.FC<IntroProps> = ({ duration, channelStyle }) => {
           <div
             style={{
               color: "#ffffff",
-              fontSize: 122,
+              fontSize: Math.max(44, Math.min(100, Math.round(2400 / Math.sqrt(channelStyle.videoTitle.length)))),
               fontWeight: 900,
               lineHeight: 1.15,
               letterSpacing: -1,
@@ -385,11 +385,11 @@ export const Intro: React.FC<IntroProps> = ({ duration, channelStyle }) => {
         </div>
       </div>
 
-      {/* Línea divisora */}
+      {/* Línea divisora — posición relativa al fontSize */}
       <div
         style={{
           position: "absolute",
-          top: "calc(50% + 54px)",
+          top: `calc(50% + ${Math.max(70, Math.min(110, Math.round(1800 / Math.sqrt(channelStyle.videoTitle.length))))}px)`,
           left: `${50 - 18 * lineGrow}%`,
           width: `${36 * lineGrow}%`,
           height: 1,
@@ -398,11 +398,11 @@ export const Intro: React.FC<IntroProps> = ({ duration, channelStyle }) => {
         }}
       />
 
-      {/* Nombre del canal */}
+      {/* Nombre del canal — posición relativa al fontSize */}
       <div
         style={{
           position: "absolute",
-          top: "calc(50% + 100px)",
+          top: `calc(50% + ${Math.max(110, Math.min(160, Math.round(2800 / Math.sqrt(channelStyle.videoTitle.length))))}px)`,
           left: "50%",
           transform: `translate(-50%, ${channelY}px)`,
           opacity: Math.min(channelReveal, channelFade),

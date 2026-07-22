@@ -7,7 +7,7 @@ export interface SubtitleLine {
 export type TransitionType = "fade" | "radial" | "glitch" | "flash" | "zoom-blur" | "shatter" | "crossfade" | "slide-left" | "slide-right" | "slide-up" | "slide-down" | "whip" | "zoom-in" | "zoom-out" | "pixelate";
 
 export type Sentiment = "calm" | "tension" | "drama" | "terror" | "resolution" | "mystery" | "rage" | "despair" | "triumph" | "dread";
-export type Climate = "clear" | "rain" | "storm";
+export type Climate = "clear" | "rain" | "storm" | "matrix";
 
 export interface ContentPalette {
   primaryColor: string;

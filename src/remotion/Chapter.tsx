@@ -377,6 +377,30 @@ const ChapterTitleCard: React.FC<{
     );
   }
 
+  const titleParts = (() => {
+    // 1) Pipe separator (explicit 3-part format) — backward compat
+    if (scene.title.includes("|")) {
+      return scene.title.split("|").map((p: string) => p.trim());
+    }
+    // 2) Period + colon parsing: "Large. Medium: Small"
+    const dotIdx = scene.title.indexOf(".");
+    if (dotIdx !== -1) {
+      const large = scene.title.slice(0, dotIdx).trim();
+      const rest = scene.title.slice(dotIdx + 1).trim();
+      const colonIdx = rest.indexOf(":");
+      if (colonIdx !== -1) {
+        return [large, rest.slice(0, colonIdx).trim(), rest.slice(colonIdx + 1).trim()];
+      }
+      return [large, rest];
+    }
+    // 3) Colon only: "Large: Medium"
+    const colonIdx = scene.title.indexOf(":");
+    if (colonIdx !== -1) {
+      return [scene.title.slice(0, colonIdx).trim(), scene.title.slice(colonIdx + 1).trim()];
+    }
+    return [scene.title.trim()];
+  })();
+
   return (
     <div
       style={{
@@ -417,17 +441,61 @@ const ChapterTitleCard: React.FC<{
         >
           &gt;&gt; CAPÍTULO {String(scene.chapterIndex + 1).padStart(2, "0")}
         </div>
-        <div
-          style={{
-            color: "#ffffff",
-            fontSize: 54,
-            fontWeight: 500,
-            lineHeight: 1.35,
-            textShadow: `0 2px 15px rgba(0,0,0,0.5), 0 0 ${20 * glowPulse}px ${primaryColor}66`,
-          }}
-        >
-          {scene.title}
-        </div>
+        {titleParts.length === 1 ? (
+          <div
+            style={{
+              color: "#ffffff",
+              fontSize: 54,
+              fontWeight: 500,
+              lineHeight: 1.35,
+              textShadow: `0 2px 15px rgba(0,0,0,0.5), 0 0 ${20 * glowPulse}px ${primaryColor}66`,
+            }}
+          >
+            {titleParts[0]}
+          </div>
+        ) : (
+          <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+            <div
+              style={{
+                color: "#ffffff",
+                fontSize: 48,
+                fontWeight: 700,
+                lineHeight: 1.2,
+                letterSpacing: 3,
+                textShadow: `0 2px 15px rgba(0,0,0,0.5), 0 0 ${20 * glowPulse}px ${primaryColor}66`,
+              }}
+            >
+              {titleParts[0]}
+            </div>
+            <div
+              style={{
+                color: primaryColor,
+                fontSize: 30,
+                fontWeight: 400,
+                lineHeight: 1.3,
+                letterSpacing: 2,
+                textShadow: `0 2px 10px rgba(0,0,0,0.4)`,
+              }}
+            >
+              {titleParts[1]}
+            </div>
+            {titleParts[2] && (
+              <div
+                style={{
+                  color: "#888888",
+                  fontSize: 20,
+                  fontWeight: 300,
+                  fontStyle: "italic",
+                  lineHeight: 1.3,
+                  letterSpacing: 1,
+                  marginTop: 4,
+                }}
+              >
+                {titleParts[2]}
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

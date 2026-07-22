@@ -35,8 +35,17 @@ const overlayStyle: React.CSSProperties = {
   overflow: "hidden",
 };
 
+const CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789[]{}<>#@&%=+-*/_~|:;";
+const BRIGHT_COLOR = "#a8d8ff";
+
+function getMatrixColor(frame: number, i: number, baseColor: string): string {
+  const pulse = Math.sin(frame * 0.03 + i * 0.7) * 0.3 + 0.7;
+  return `rgba(168, 216, 255, ${pulse * 0.6})`;
+}
+
 export const Storm: React.FC<OverlayProps & { climate: Climate }> = ({ frame, width, height, color, climate }) => {
   const isStorm = climate === "storm";
+  const isMatrix = climate === "matrix";
 
   const drops = useMemo(() => {
     if (isStorm) {
@@ -56,6 +65,95 @@ export const Storm: React.FC<OverlayProps & { climate: Climate }> = ({ frame, wi
       phase: (i * 23) % 200,
     }));
   }, [width, isStorm]);
+
+  const dataStreams = useMemo(() => {
+    if (!isMatrix) return [];
+    const streams: {
+      x: number; y: number; char: string; speed: number;
+      opacity: number; phase: number; size: number;
+    }[] = [];
+    for (let i = 0; i < 35; i++) {
+      streams.push({
+        x: width * ((i * 37 + 13) % 97) / 100,
+        y: height * ((i * 23 + 7) % 97) / 100,
+        char: CHARS[Math.floor(Math.random() * CHARS.length)],
+        speed: 0.3 + ((i * 3) % 15) * 0.2,
+        opacity: 0.25 + ((i * 7) % 35) / 100,
+        phase: (i * 41) % 300,
+        size: 24 + ((i * 5) % 16),
+      });
+    }
+    return streams;
+  }, [width, height, isMatrix]);
+
+  const hudRings = useMemo(() => {
+    if (!isMatrix) return [];
+    return Array.from({ length: 3 }, (_, i) => ({
+      cx: width * (0.15 + i * 0.35),
+      cy: height * (0.2 + i * 0.3),
+      r: 30 + i * 25,
+      phase: i * 50,
+    }));
+  }, [width, height, isMatrix]);
+
+  if (isMatrix) {
+    return (
+      <svg viewBox={`0 0 ${width} ${height}`} style={overlayStyle}>
+        <defs>
+          <linearGradient id="streamFade" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor={BRIGHT_COLOR} stopOpacity="0" />
+            <stop offset="50%" stopColor={BRIGHT_COLOR} stopOpacity="0.6" />
+            <stop offset="100%" stopColor={BRIGHT_COLOR} stopOpacity="0" />
+          </linearGradient>
+          <filter id="glow">
+            <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+            <feMerge>
+              <feMergeNode in="coloredBlur"/>
+              <feMergeNode in="SourceGraphic"/>
+            </feMerge>
+          </filter>
+        </defs>
+
+        {dataStreams.map((s, i) => {
+          const offset = (frame * s.speed * 2 + s.phase) % 200;
+          const visible = offset < 160 && offset > 5;
+          if (!visible) return null;
+          const op = s.opacity * interpolate(offset, [5, 40, 120, 160], [0, s.opacity, s.opacity, 0]);
+          const charIndex = Math.floor((frame * 0.1 + i * 7) % CHARS.length);
+          const yPos = (s.y + offset * 1.2) % (height + 30) - 15;
+          return (
+            <text key={i}
+              x={s.x}
+              y={yPos}
+              fill={BRIGHT_COLOR}
+              opacity={op}
+              fontSize={s.size}
+              fontFamily="monospace"
+              fontWeight="bold"
+              filter="url(#glow)"
+            >
+              {CHARS[(charIndex + i * 3) % CHARS.length]}
+            </text>
+          );
+        })}
+
+        {hudRings.map((r, i) => {
+          const pulse = Math.sin(frame * 0.02 + r.phase * 0.1) * 0.3 + 0.7;
+          const grow = Math.sin(frame * 0.015 + i * 1.2) * 10;
+          return (
+            <circle key={i}
+              cx={r.cx} cy={r.cy}
+              r={r.r + grow}
+              fill="none"
+              stroke={BRIGHT_COLOR}
+              strokeWidth={1}
+              opacity={pulse * 0.25}
+            />
+          );
+        })}
+      </svg>
+    );
+  }
 
   return (
     <svg viewBox={`0 0 ${width} ${height}`} style={overlayStyle}>

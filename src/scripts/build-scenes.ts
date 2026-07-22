@@ -1023,10 +1023,11 @@ async function assignFramesWithWeights(
   }[] = [];
 
   for (const dirImg of dirImages) {
-    const visual = allVisuals.find((v) => v.path.endsWith(dirImg.imageFile));
+    const visual = allVisuals.find((v) => path.basename(v.path) === dirImg.imageFile);
     if (!visual) continue;
 
     const parsed = parseTextInclude(dirImg.textInclude || "");
+
     const sentiment = parsed.clean ? analyzeSentiment(parsed.clean) : dirImg.sentiment;
 
     segments.push({
@@ -1225,7 +1226,7 @@ function assignFramesFromDirections(
   // Map direction imageFile to actual allVisuals path
   for (let i = 0; i < dirImages.length; i++) {
     const dirImg = dirImages[i];
-    const visual = allVisuals.find((v) => v.path.endsWith(dirImg.imageFile));
+    const visual = allVisuals.find((v) => path.basename(v.path) === dirImg.imageFile);
     if (!visual) continue;
 
     result.push({
@@ -1408,7 +1409,7 @@ export async function buildScenes(
             );
             if (allHaveDuration) {
               imageMetas = chapterDir.images.map((img: { imageFile: string; durationInFrames: number; sentiment: Sentiment; transitionToNext: TransitionType; transitionDuration: number; kenBurnsStart: number; kenBurnsEnd: number; protagonist?: string }) => {
-                const visual = allVisuals.find((v) => v.path.endsWith(img.imageFile));
+                const visual = allVisuals.find((v) => path.basename(v.path) === img.imageFile);
                 return {
                   path: visual?.path || img.imageFile,
                   fileType: "image" as const,
@@ -1454,7 +1455,7 @@ export async function buildScenes(
               }
               if (rawFrames.length > 0) rawFrames[rawFrames.length - 1] += totalFrames - sumRaw;
               imageMetas = chapterDir.images.map((img: { imageFile: string; transitionToNext: TransitionType; transitionDuration: number; sentiment: Sentiment; kenBurnsStart: number; kenBurnsEnd: number; protagonist?: string }, idx: number) => {
-                const visual = allVisuals.find((v) => v.path.endsWith(img.imageFile));
+                const visual = allVisuals.find((v) => path.basename(v.path) === img.imageFile);
                 return {
                   path: visual?.path || img.imageFile,
                   fileType: "image" as const,

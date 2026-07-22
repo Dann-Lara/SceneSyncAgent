@@ -298,7 +298,7 @@ export async function buildMusicVideoScenes(videoDir: string): Promise<BuildResu
       audioDurationSeconds: 0,
       durationInFrames: preChorusMetas.reduce((sum, img) => sum + img.durationInFrames, 0),
       images: preChorusMetas,
-      climate: "rain",
+      climate: "matrix",
     },
     {
       chapterIndex: 1,
@@ -307,7 +307,7 @@ export async function buildMusicVideoScenes(videoDir: string): Promise<BuildResu
       audioDurationSeconds: 0,
       durationInFrames: postChorusMetas.reduce((sum, img) => sum + img.durationInFrames, 0),
       images: postChorusMetas,
-      climate: "storm",
+      climate: "matrix",
     },
   ];
 
