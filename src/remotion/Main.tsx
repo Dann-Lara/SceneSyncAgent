@@ -130,19 +130,22 @@ export const Main: React.FC<VideoInput & Record<string, unknown>> = ({
     acc += s.durationInFrames;
   }
 
-  // Intro fade: complete when first word actually starts (skip initial silence)
-  let firstWordFrame = sceneAudioStarts[0];
-  const firstScene = scenes[0];
-  if (firstScene?.silences?.[0]?.startFrame === 0)
-    firstWordFrame += firstScene.silences[0].endFrame;
+  const chapterFirstWord: number[] = [];
+  const chapterLastWord: number[] = [];
+  for (let i = 0; i < scenes.length; i++) {
+    const sc = scenes[i];
+    const scStart = sceneAudioStarts[i];
+    let fw = scStart;
+    if (sc.silences?.[0]?.startFrame === 0) fw = scStart + sc.silences[0].endFrame;
+    chapterFirstWord.push(fw);
+    let lw = scStart + sc.durationInFrames;
+    const ls = sc.silences?.at(-1);
+    if (ls && ls.endFrame >= sc.durationInFrames * 0.8) lw = scStart + ls.startFrame;
+    chapterLastWord.push(lw);
+  }
 
-  // Outro fade: start when last word actually ends (skip trailing silence)
-  const lastIdx = scenes.length - 1;
-  let lastWordEnd = sceneAudioStarts[lastIdx] + scenes[lastIdx].durationInFrames;
-  const lastScene = scenes[lastIdx];
-  const lastSil = lastScene?.silences?.at(-1);
-  if (lastSil && lastSil.endFrame >= lastScene.durationInFrames - CHAPTER_AUDIO_EXTRA - 1)
-    lastWordEnd = sceneAudioStarts[lastIdx] + lastSil.startFrame;
+  let firstWordFrame = chapterFirstWord[0] ?? sceneAudioStarts[0];
+  let lastWordEnd = chapterLastWord.at(-1) ?? (sceneAudioStarts[scenes.length - 1] + scenes[scenes.length - 1].durationInFrames);
 
   return (
     <AbsoluteFill style={{ backgroundColor: channelStyle.backgroundColor }}>
@@ -185,6 +188,25 @@ export const Main: React.FC<VideoInput & Record<string, unknown>> = ({
                   return (MUSIC_VOLUME * (1 - t) + 1.0 * t) * crossfadeFactor;
                 }
 
+                for (let ci = 0; ci < scenes.length - 1; ci++) {
+                  const gapStart = chapterLastWord[ci];
+                  const gapEnd = chapterFirstWord[ci + 1];
+                  if (globalFrame >= gapStart && globalFrame < gapEnd) {
+                    const boost = Math.min((gapEnd - gapStart) / 30 * 0.5, 2.0);
+                    const rampUp = gapStart + DUCK_RAMP_FRAMES;
+                    const rampDown = gapEnd - DUCK_RAMP_FRAMES;
+                    if (globalFrame < rampUp) {
+                      const t = (globalFrame - gapStart) / DUCK_RAMP_FRAMES;
+                      return MUSIC_VOLUME * crossfadeFactor * (1 + boost * easeInOut(t));
+                    }
+                    if (globalFrame >= rampDown) {
+                      const t = (globalFrame - rampDown) / DUCK_RAMP_FRAMES;
+                      return MUSIC_VOLUME * crossfadeFactor * (1 + boost * easeInOut(1 - t));
+                    }
+                    return MUSIC_VOLUME * crossfadeFactor * (1 + boost);
+                  }
+                }
+
                 for (let s = 0; s < scenes.length; s++) {
                   const sc = scenes[s];
                   const scStart = sceneAudioStarts[s];
@@ -192,6 +214,8 @@ export const Main: React.FC<VideoInput & Record<string, unknown>> = ({
                   if (globalFrame >= scStart && globalFrame < scEnd && sc.silences) {
                     const localFrame = globalFrame - scStart;
                     for (const sil of sc.silences) {
+                      if (sil.startFrame === 0) continue;
+                      if (sil.endFrame >= sc.durationInFrames * 0.8) continue;
                       const minRamp = sil.startFrame - DUCK_RAMP_FRAMES;
                       const maxRamp = sil.endFrame + DUCK_RAMP_FRAMES;
                       if (localFrame < minRamp || localFrame >= maxRamp) continue;
